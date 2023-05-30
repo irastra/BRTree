@@ -160,6 +160,9 @@ class Node {
     }
 
     Node * UncleNode() {
+        if (parent == nullptr || parent->parent == nullptr){
+            return nullptr;
+        }
         return ImLeftNode() ? parent->parent->right_child : parent->parent->left_child;
     }
 
@@ -170,41 +173,43 @@ class Node {
     Node * RightRotation(){
         Node * _parent = parent;
         Node * lr = left_child->right_child;
+        Node * l = left_child;
         bool is_left = ImLeftNode();
         left_child->RemoveFromParent();
         lr->RemoveFromParent();
         RemoveFromParent();
         AddLeftChild(lr);
-        left_child->AddRightChild(this);
+        l->AddRightChild(this);
         if(_parent != nullptr){
             if (is_left){
-                _parent->AddLeftChild(left_child);
+                _parent->AddLeftChild(l);
             }else{
-                _parent->AddRightChild(left_child);
+                _parent->AddRightChild(l);
             }
             return nullptr;
         }
-        return left_child;
+        return l;
     }
 
     Node * LeftRotation() {
         Node * _parent = parent;
         Node * rl = right_child->left_child;
+        Node * r = right_child;
         bool is_left = ImLeftNode();
         right_child->RemoveFromParent();
         rl->RemoveFromParent();
         RemoveFromParent();
         AddRightChild(rl);
-        right_child->AddLeftChild(this);
+        r->AddLeftChild(this);
         if (parent != nullptr){
             if (is_left){
-                _parent->AddLeftChild(right_child);
+                _parent->AddLeftChild(r);
             }else{
-                _parent->AddRightChild(right_child);
+                _parent->AddRightChild(r);
             }
             return nullptr;
         }
-        return right_child;
+        return r;
     }
 };
 
@@ -414,7 +419,7 @@ Node * RepairInsertTree(Node * node){
     Node * parent = node->parent;
     Node * uncle = node->UncleNode();
     Node * grand_parent = parent->parent;
-    cout << node->value << " " << parent->value << " " << uncle->value<< " " << grand_parent->value<< endl;
+    //cout << node->value << " " << parent->value << " " << uncle->value<< " " << grand_parent->value<< endl;
         
     if (parent->IsBalck()){
         cout << "1" << endl;
@@ -500,10 +505,11 @@ void BRTreeTest1(){
 }
 
 int main(){
-    Node * root = BRTreeInsert(nullptr, 9);
+    int max_val = 16;
+    Node * root = BRTreeInsert(nullptr, max_val);
     PrintTree(root);
-    for(int i = 1; i < 3; i++){
-        root = BRTreeInsert(root, 9 - i);
+    for(int i = 1; i < max_val; i++){
+        root = BRTreeInsert(root, max_val - i);
         cout << "root:" << root << endl;
         PrintTree(root);
     }
