@@ -86,7 +86,7 @@ class Node {
         black_height -= 1;
     }
 
-    void MakeBalck(){
+    void MackBlack(){
         if (node_color == NodeColor::BLACK){
             return;
         }
@@ -95,15 +95,23 @@ class Node {
     }
 
     void AddLeftChild(Node * node){
-        assert(left_child == nullptr);
+        assert(left_child == nullptr || left_child->is_leaf);
         assert(node->parent == nullptr);
+        if (left_child != nullptr && left_child->is_leaf){
+            left_child->RemoveFromParent();
+            delete left_child;
+        }
         left_child = node;
         node->parent = this;
     }
 
     void AddRightChild(Node * node){
-        assert(right_child == nullptr);
+        assert(right_child == nullptr || right_child->is_leaf);
         assert(node->parent == nullptr);
+        if (right_child!= nullptr && right_child->is_leaf){
+            right_child->RemoveFromParent();
+            delete right_child;
+        }
         right_child = node;
         node->parent = this;
     }
@@ -130,56 +138,76 @@ class Node {
     bool operator == (const Node & other){
         return value == other.value;
     }
+
+    bool HasValueLeftChild(){
+        return !left_child->is_leaf;
+    }
+
+    bool HasValueRightChild(){
+        return !right_child->is_leaf;
+    }
+
+    bool ImLeftNode(){
+        return parent != nullptr && this == parent->left_child;
+    }
+
+    bool ImRightNode() {
+        return parent !=nullptr && this == parent->right_child;
+    }
+
+    bool ImRootNode() {
+        return parent == nullptr;
+    }
+
+    Node * UncleNode() {
+        return ImLeftNode() ? parent->parent->right_child : parent->parent->left_child;
+    }
+
+    bool IsBalck(){
+        return node_color == NodeColor::BLACK;
+    }
+
+    Node * RightRotation(){
+        Node * _parent = parent;
+        Node * lr = left_child->right_child;
+        bool is_left = ImLeftNode();
+        left_child->RemoveFromParent();
+        lr->RemoveFromParent();
+        RemoveFromParent();
+        AddLeftChild(lr);
+        left_child->AddRightChild(this);
+        if(_parent != nullptr){
+            if (is_left){
+                _parent->AddLeftChild(left_child);
+            }else{
+                _parent->AddRightChild(left_child);
+            }
+            return nullptr;
+        }
+        return left_child;
+    }
+
+    Node * LeftRotation() {
+        Node * _parent = parent;
+        Node * rl = right_child->left_child;
+        bool is_left = ImLeftNode();
+        right_child->RemoveFromParent();
+        rl->RemoveFromParent();
+        RemoveFromParent();
+        AddRightChild(rl);
+        right_child->AddLeftChild(this);
+        if (parent != nullptr){
+            if (is_left){
+                _parent->AddLeftChild(right_child);
+            }else{
+                _parent->AddRightChild(right_child);
+            }
+            return nullptr;
+        }
+        return right_child;
+    }
 };
 
-void PrintTree(Node * node){
-    queue<Node*> node_que1, node_que2;
-    queue<Node*> * cur_node_que_ptr = &node_que1, *back_node_que_ptr= &node_que2;
-    queue<Node*> *tmp=nullptr;
-    if(node==nullptr){
-        cout << " Empty Tree !" << endl;
-    }
-    cur_node_que_ptr->push(node);
-    while(!cur_node_que_ptr->empty()){
-        int cnt = 0;
-        while(!cur_node_que_ptr->empty()){
-            node = cur_node_que_ptr->front();
-            cur_node_que_ptr->pop();
-            int print_cnt =  node->order_idx - cnt - 1;
-            for (int i = 0; i < print_cnt; i++){
-                print(" ");
-                cnt += 1;
-            }
-            if (node->is_leaf){
-                print("*");
-            }else{
-                if (node->node_color == NodeColor::RED){
-                    print("<"+std::to_string(node->value)+">");
-                }else {
-                    print("<"+std::to_string(node->value)+">");
-                }
-            }
-            cnt += 1;
-            if (node->left_child!=nullptr){
-                back_node_que_ptr->push(node->left_child);
-            }
-            if (node->right_child!=nullptr){
-                back_node_que_ptr->push(node->right_child);
-            }
-        }
-        cout << endl;
-        tmp = cur_node_que_ptr;
-        cur_node_que_ptr = back_node_que_ptr;
-        back_node_que_ptr = tmp;
-    }
-}
-
-void InsertNodeTree(Node * root, Node * node){
-    if (root == nullptr){
-        node->MakeBalck();
-        node->CreateLeaf();
-    }
-}
 
 void RefreshNodePosition(Node* node, int ** last_value){
     if (node == nullptr){
@@ -208,9 +236,58 @@ void RefreshNodePosition(Node* node, int ** last_value){
     }
 }
 
+
 void RefreshTree(Node * root){
     int * ptr = nullptr;
     RefreshNodePosition(root, &ptr);
+}
+
+void PrintTree(Node * node){
+    Node * root = node;
+    queue<Node*> node_que1, node_que2;
+    queue<Node*> * cur_node_que_ptr = &node_que1, *back_node_que_ptr= &node_que2;
+    queue<Node*> *tmp=nullptr;
+    if(node==nullptr){
+        cout << " Empty Tree !" << endl;
+    }
+    RefreshTree(node);
+    cur_node_que_ptr->push(node);
+    while(!cur_node_que_ptr->empty()){
+        int cnt = 0;
+        while(!cur_node_que_ptr->empty()){
+            node = cur_node_que_ptr->front();
+            cur_node_que_ptr->pop();
+            int print_cnt =  node->order_idx - cnt - 1;
+            for (int i = 0; i < print_cnt; i++){
+                print(" ");
+                cnt += 1;
+            }
+            if (node->is_leaf){
+                print("[*]");
+            }else{
+                if (node->node_color == NodeColor::RED){
+                    print("<"+std::to_string(node->value)+">");
+                }else {
+                    print("["+std::to_string(node->value)+"]");
+                }
+            }
+            cnt += 1;
+            if (node->left_child!=nullptr){
+                back_node_que_ptr->push(node->left_child);
+            }
+            if (node->right_child!=nullptr){
+                back_node_que_ptr->push(node->right_child);
+            }
+        }
+        cout << endl;
+        tmp = cur_node_que_ptr;
+        cur_node_que_ptr = back_node_que_ptr;
+        back_node_que_ptr = tmp;
+    }
+    for (int i = 0; i < root->width * 4; i++){
+        cout << "-";
+    }
+    cout << endl;
 }
 
 void FullBiaryTree(Node* root, int depth, int * idx){
@@ -306,7 +383,7 @@ void DelNodeByValue(Node* root, int value){
     }
 }
 
-int main(){
+void BinarySearchTreeTest(){
     Node * root = new Node(0);
     //FullBiaryTree(root, 4, &idx);
     InsertValueToSearchTree(root, 8);
@@ -318,7 +395,6 @@ int main(){
     InsertValueToSearchTree(root, 10);
     InsertValueToSearchTree(root, 11);
 
-    RefreshTree(root);
     PrintTree(root);
     DelNodeByValue(root, 8);
     DelNodeByValue(root, 5);
@@ -329,7 +405,107 @@ int main(){
     DelNodeByValue(root, 12);
     DelNodeByValue(root, 10);
     DelNodeByValue(root, 11);
-    RefreshTree(root);
     PrintTree(root);
+}
+
+Node * RepairInsertTree(Node * node){
+    assert(!node->IsBalck());
+    cout << "0" << endl;
+    Node * parent = node->parent;
+    Node * uncle = node->UncleNode();
+    Node * grand_parent = parent->parent;
+    cout << node->value << " " << parent->value << " " << uncle->value<< " " << grand_parent->value<< endl;
+        
+    if (parent->IsBalck()){
+        cout << "1" << endl;
+        return nullptr;
+    }
+    if (!parent->IsBalck() && !uncle->IsBalck()){
+        parent->MackBlack();
+        uncle->MackBlack();
+        if(grand_parent->IsRoot()){
+            cout << "2" << endl;
+            return nullptr;
+        }
+        cout << "3" << endl;
+        grand_parent->MakeRed();
+        return RepairInsertTree(grand_parent);
+    }
+    grand_parent->MakeRed();
+    parent->MackBlack();
+    if (parent->ImLeftNode()){
+        if (node->ImRightNode()){
+            cout << "4" << endl;
+            parent->LeftRotation();
+        }
+        cout << "5" << endl;
+        return grand_parent->RightRotation();
+    }
+    else{
+        if (node->ImLeftNode()){
+            cout << "6" << endl;
+            parent->RightRotation();
+        }
+        cout << "7" << endl;
+        return grand_parent->LeftRotation();
+    }
+}
+
+Node * BRTreeInsert(Node * root, int val){
+    Node * node = new Node(val);
+    node->MakeRed();
+    node->CreateLeaf();
+    if (root == nullptr){
+        node->MackBlack();
+        return node;
+    }
+    Node * find_node = root;
+    while(find_node != nullptr){
+        if (find_node->value > val && find_node->HasValueLeftChild()){
+            find_node = find_node->left_child;
+        }else if(find_node->value < val && find_node->HasValueRightChild()){
+            find_node = find_node->right_child;
+        }else{
+            break;
+        }
+    }
+    if (find_node->value > val){
+        find_node->AddLeftChild(node);
+    }else {
+        find_node->AddRightChild(node);
+    }
+    if(find_node->parent == nullptr){
+        // 只有根节点一层
+        return root;
+    }
+    Node * new_root = RepairInsertTree(node);
+    return  new_root == nullptr ? root : new_root; 
+}
+
+void BRTreeTest1(){
+    Node * root = BRTreeInsert(nullptr, 7);
+    PrintTree(root);
+    BRTreeInsert(root, 5);
+    PrintTree(root);
+    BRTreeInsert(root, 9);
+    PrintTree(root);
+    BRTreeInsert(root, 3);
+    PrintTree(root);
+    BRTreeInsert(root, 6);
+    PrintTree(root);
+    BRTreeInsert(root, 8);
+    PrintTree(root);
+    BRTreeInsert(root, 10);
+    PrintTree(root);
+}
+
+int main(){
+    Node * root = BRTreeInsert(nullptr, 9);
+    PrintTree(root);
+    for(int i = 1; i < 3; i++){
+        root = BRTreeInsert(root, 9 - i);
+        cout << "root:" << root << endl;
+        PrintTree(root);
+    }
     return 0;
 }
