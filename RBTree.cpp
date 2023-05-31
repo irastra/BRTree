@@ -16,7 +16,6 @@ class Node {
     Node * left_child;
     Node * right_child;
     Node * parent;
-    int black_height;
     bool is_leaf;
     int height;
     int order_idx;
@@ -35,7 +34,6 @@ class Node {
         node_color = NodeColor::RED;
         left_child = right_child = parent = nullptr;
         is_leaf = false;
-        black_height = 0;
         height = order_idx = width = 0 ;
     }
 
@@ -56,26 +54,21 @@ class Node {
 
     void CreateLeaf() {
         assert(!is_leaf);
-        assert(left_child==nullptr && right_child==nullptr);
-        Node * left = new Node();
-        left->node_color = NodeColor::BLACK;
-        left->is_leaf = true;
-        left->black_height = 1;
-        left->parent = this;
-        left_child = left;
-        Node * right = new Node();
-        right->node_color = NodeColor::BLACK;
-        right->is_leaf = true;
-        right->black_height = 1;
-        right->parent = this;
-        right_child = right;
-        RefreshHeight();
-    }
-
-    void RefreshHeight() {
-        assert (left_child != nullptr && right_child != nullptr);
-        assert (left_child->black_height == right_child->black_height);
-        black_height = node_color == NodeColor::BLACK ? left_child->black_height + 1 : left_child->black_height;
+        assert(left_child==nullptr or right_child==nullptr);
+        if (left_child == nullptr){
+            Node * left = new Node();
+            left->node_color = NodeColor::BLACK;
+            left->is_leaf = true;
+            left->parent = this;
+            left_child = left;
+        }
+        if(right_child == nullptr){
+            Node * right = new Node();
+            right->node_color = NodeColor::BLACK;
+            right->is_leaf = true;
+            right->parent = this;
+            right_child = right;
+        }
     }
 
     void MakeRed(){
@@ -83,7 +76,6 @@ class Node {
             return ;
         }
         node_color = NodeColor::RED;
-        black_height -= 1;
     }
 
     void MackBlack(){
@@ -91,7 +83,6 @@ class Node {
             return;
         }
         node_color = NodeColor::BLACK;
-        black_height += 1;
     }
 
     void AddLeftChild(Node * node){
@@ -164,6 +155,13 @@ class Node {
             return nullptr;
         }
         return ImLeftNode() ? parent->parent->right_child : parent->parent->left_child;
+    }
+
+    Node * Brother() {
+        if (parent == nullptr){
+            return nullptr;
+        }
+        return ImLeftNode()? parent->right_child : parent->left_child;
     }
 
     bool IsBalck(){
@@ -487,6 +485,99 @@ Node * BRTreeInsert(Node * root, int val){
     return  new_root == nullptr ? root : new_root; 
 }
 
+Node * RepairRemoveTree(Node * node){
+    if (node->IsRoot()){
+        if(node->right_child->is_leaf){
+            delete node;
+            return nullptr;
+        }else{
+            Node * r = node->right_child;
+            r->RemoveFromParent();
+            delete node;
+            return r;
+        }
+    }
+    return nullptr;
+}
+
+
+Node * BRTreeRemove(Node * root, int val){
+    if (root == nullptr){
+        return root;
+    }
+    Node * find_node = root;
+    while(find_node != nullptr){
+        if (val < find_node->value){
+            if(find_node->left_child->is_leaf){
+                return root;
+            }
+            find_node = find_node->left_child;
+        }else if (val > find_node->value){
+            if(find_node->right_child->is_leaf){
+                return root;
+            }
+            find_node = find_node->right_child;
+        }else {
+            break;
+        }
+    }
+    if(!find_node->left_child->is_leaf && !find_node->right_child->is_leaf){
+        Node * del_node = find_node;
+        // # 找前驱
+        find_node = find_node->left_child;
+        while(!find_node->right_child->is_leaf){
+            find_node = find_node->right_child;
+        }
+        del_node->value = find_node->value;
+    }
+    Node * parent = find_node->parent;
+    Node * brother = find_node->Brother();
+    if(parent != nullptr && find_node->parent->parent == nullptr){
+        find_node->RemoveFromParent();
+        delete find_node;
+        if (!brother->is_leaf and brother->IsBalck()){
+            brother->MakeRed();
+        }
+        parent->CreateLeaf();
+        return root;
+    }
+    if(!find_node->IsBalck()){
+        bool is_left_child = find_node->ImLeftNode();
+        if (find_node->left_child->is_leaf && find_node->right_child->is_leaf){
+            find_node->RemoveFromParent();
+            if (parent != nullptr){
+                parent->CreateLeaf();
+            }
+            delete find_node;
+            return root;
+        }else if(find_node->left_child->is_leaf){
+            Node * rc = find_node->right_child;
+            find_node->RemoveFromParent();
+            if (parent != nullptr){
+                parent->CreateLeaf();
+            }
+            delete find_node;
+            is_left_child ? parent->AddLeftChild(rc) : parent->AddRightChild(rc);
+            return root;
+        }else if(find_node->right_child->is_leaf){
+            Node * lc = find_node->left_child;
+            find_node->RemoveFromParent();
+            if (parent != nullptr){
+                parent->CreateLeaf();
+            }
+            delete find_node;
+            is_left_child ? parent->AddLeftChild(lc) : parent->AddRightChild(lc);
+            return root;
+        }
+        // 不可能存在删除双子树的情况
+        assert(true);
+    }else{
+        // 删除黑节点
+        return RepairRemoveTree(find_node);
+    }
+    return root;
+}
+
 void BRTreeTest1(){
     Node * root = BRTreeInsert(nullptr, 7);
     PrintTree(root);
@@ -505,7 +596,7 @@ void BRTreeTest1(){
 }
 
 int main(){
-    int max_val = 16;
+    int max_val = 3;
     Node * root = BRTreeInsert(nullptr, max_val);
     PrintTree(root);
     for(int i = 1; i < max_val; i++){
@@ -513,5 +604,11 @@ int main(){
         cout << "root:" << root << endl;
         PrintTree(root);
     }
+    root = BRTreeRemove(root, 2);
+    PrintTree(root);
+    root = BRTreeRemove(root, 1);
+    PrintTree(root);
+    root = BRTreeRemove(root, 3);
+    PrintTree(root);
     return 0;
 }
