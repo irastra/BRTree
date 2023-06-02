@@ -219,6 +219,23 @@ public:
 		}
 		return r;
 	}
+
+	Node * UpRotationRLSon() {
+		Node * root = this;
+		Node * r = right_child;
+		Node * rl = r->left_child;
+		Node * rr = r->right_child;
+		Node * r_son = rr->left_child;
+		Node * r_son_l = r_son->left_child;
+		Node * r_son_r = r_son->right_child;
+		r_son_l->RemoveFromParent();
+		r_son_r->RemoveFromParent();
+		r_son->RemoveFromParent();
+		r->AddLeftChild(r_son_r);
+		RemoveFromParent();
+		AddRightChild(r_son_l);
+		r_son->AddRightChild(this);
+	}
 };
 
 int _RBTreeCheckBlackHeight(Node * root, bool & valid) {
