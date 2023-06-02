@@ -549,22 +549,36 @@ Node * RepairRemoveTree(Node * node) {
 	if (node->IsRoot()) {
 		return node;
 	}
+	Node * brother = node->Brother();
 	if (node->parent->IsBalck()) {
 		if (node->Brother()->IsBalck()) {
 			// b(-1) b b, 左右黑高相同,向上推黑节点(n-1)
-			node->Brother()->MakeRed();
-			return RepairRemoveTree(node->parent);
+			if (brother->left_child->IsBalck() && brother->right_child->IsBalck()) {
+				node->Brother()->MakeRed();
+				return RepairRemoveTree(node->parent);
+			}
+			else {
+				Node * local_root = nullptr;
+				if (node->ImLeftNode()) {
+					local_root = node->parent->LeftRotation();
+					brother->right_child->MakeBlack();
+				}
+				else {
+					local_root = node->parent->RightRotation();
+					brother->left_child->MakeBlack();
+				}
+				return local_root;
+			}
 		}
 		else {
 			// b(-1) b r
 			node->Brother()->MakeBlack();
-			if (!node->parent->IsRoot()) {
-				node->parent->MakeRed();
-			}
 			if (node->ImLeftNode()) {
+				node->Brother()->left_child->MakeRed();
 				return node->parent->LeftRotation();
 			}
 			else {
+				node->Brother()->right_child->MakeRed();
 				return  node->parent->RightRotation();
 			}
 		}
@@ -772,11 +786,12 @@ Node * BRTreeRemove(Node * root, int val) {
 				if (!brother->IsBalck()) {
 					// b - b - r (b, b)
 					if (is_left) {
-						local_root = parent->LeftRotation();
+						parent->LeftRotation();
 					}
 					else {
-						local_root = parent->RightRotation();
+						parent->RightRotation();
 					}
+					local_root = brother;
 					local_root->MakeBlack();
 					parent->left_child->MakeRed();
 					parent->right_child->MakeRed();
