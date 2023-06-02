@@ -208,7 +208,7 @@ public:
 		RemoveFromParent();
 		AddRightChild(rl);
 		r->AddLeftChild(this);
-		if (parent != nullptr) {
+		if (_parent != nullptr) {
 			if (is_left) {
 				_parent->AddLeftChild(r);
 			}
@@ -290,13 +290,14 @@ void PrintTree(Node * node) {
 	bool valid = RBTreeCheckBlackHeight(root);
 	if (!valid) {
 		cout << " ============== invalid =============" << endl;
-		return;
+		//return;
 	}
 	queue<Node*> node_que1, node_que2;
 	queue<Node*> * cur_node_que_ptr = &node_que1, *back_node_que_ptr = &node_que2;
 	queue<Node*> *tmp = nullptr;
 	if (node == nullptr) {
 		cout << " Empty Tree !" << endl;
+		return;
 	}
 	RefreshTree(node);
 	cur_node_que_ptr->push(node);
@@ -557,25 +558,25 @@ Node * RepairRemoveTree(Node * node) {
 		else {
 			// b(-1) b r
 			node->Brother()->MakeBlack();
-			node->parent->MakeRed();
+			if (!node->parent->IsRoot()) {
+				node->parent->MakeRed();
+			}
 			if (node->ImLeftNode()) {
-				node->parent->LeftRotation();
+				return node->parent->LeftRotation();
 			}
 			else {
-				node->parent->RightRotation();
+				return  node->parent->RightRotation();
 			}
-			return nullptr;
 		}
 	}
 	else {
 		// b(-1) r b
 		if (node->ImLeftNode()) {
-			node->parent->LeftRotation();
+			return node->parent->LeftRotation();
 		}
 		else {
-			node->parent->RightRotation();
+			return node->parent->RightRotation();
 		}
-		return nullptr;
 	}
 }
 
@@ -657,6 +658,20 @@ Node * BRTreeRemove(Node * root, int val) {
 	}
 	Node * parent = find_node->parent;
 	if (parent == nullptr) {
+		if (!find_node->left_child->is_leaf) {
+			find_node->value = find_node->left_child->value;
+			find_node->left_child->RemoveFromParent();
+			delete find_node->left_child;
+			find_node->CreateLeaf();
+			return find_node;
+		}
+		else if (!find_node->right_child->is_leaf) {
+			find_node->value = find_node->right_child->value;
+			find_node->right_child->RemoveFromParent();
+			delete find_node->right_child;
+			find_node->CreateLeaf();
+			return find_node;
+		}
 		delete find_node;
 		return nullptr;
 	}
@@ -729,7 +744,7 @@ Node * BRTreeRemove(Node * root, int val) {
 					return root;
 				}
 				else if (l_l || r_r || (!brother->left_child->is_leaf && !brother->right_child->is_leaf)) {
-					// b - r - b (r, r)  / b - r - (rr)
+					// b - r - b (r, r)  / b - r - b (rr)
 					local_root = brother;
 					if (is_left) {
 						parent->LeftRotation();
@@ -757,24 +772,21 @@ Node * BRTreeRemove(Node * root, int val) {
 				if (!brother->IsBalck()) {
 					// b - b - r (b, b)
 					if (is_left) {
-						parent->LeftRotation();
+						local_root = parent->LeftRotation();
 					}
 					else {
-						parent->RightRotation();
+						local_root = parent->RightRotation();
 					}
-					brother->MakeBlack();
-					parent->MakeRed();
-					return root;
+					local_root->MakeBlack();
+					parent->left_child->MakeRed();
+					parent->right_child->MakeRed();
 				}else if (brother->left_child->is_leaf && brother->right_child->is_leaf) {
 					// b - b - b
 					brother->MakeRed();
-					Node * new_root = RepairRemoveTree(parent);
-					if (new_root == nullptr) {
-						return root;
-					}
-					return new_root;
+					local_root = RepairRemoveTree(parent);
 				}
 				else if (l_l || r_r || (!brother->left_child->is_leaf && !brother->right_child->is_leaf)) {
+					// b - b - r (b, b)
 					local_root = brother;
 					if (is_left) {
 						parent->LeftRotation();
@@ -789,7 +801,8 @@ Node * BRTreeRemove(Node * root, int val) {
 					local_root = UpRotation(parent, is_left);
 					local_root->MakeBlack();
 				}
-				if (local_root->parent == nullptr) {
+
+				if (local_root != nullptr && local_root->parent == nullptr) {
 					return local_root;
 				}
 				return root;
@@ -862,16 +875,18 @@ void UpRotationTest() {
 }
 
 int main() {
-	int max_val = 8;
-	Node * root = BRTreeInsert(nullptr, max_val);
-	PrintTree(root);
-	for (int i = 1; i < max_val; i++) {
-		root = BRTreeInsert(root, max_val - i);
+	int max_val = 20;
+	Node * root = nullptr;
+	for (int i = 0; i < max_val; i++) {
+		int value = i;
+		//int value = max_val - i;
+		cout << "insert " << value << endl;
+		root = BRTreeInsert(root, value);
 		PrintTree(root);
 	}
-	const int del_list[] = {1, 2, 3, 4};
-	for (int i = 0; i < sizeof(del_list) / sizeof(int); i++) {
-		int del_value = del_list[i];
+	for (int i = 0; i < max_val; i++) {
+		int del_value = i;
+		//int del_value = max_val - i;
 		cout << "del " << del_value << endl;
 		root = BRTreeRemove(root, del_value);
 		PrintTree(root);
