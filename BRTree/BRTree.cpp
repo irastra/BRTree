@@ -1,7 +1,8 @@
-// BRTree.cpp : �������̨Ӧ�ó������ڵ㡣
+// BRTree.cpp : black red tree
 //
-
 #include "stdafx.h"
+#include "stdlib.h"
+#include "time.h"
 #include <iostream>
 #include <assert.h>
 #include <queue>
@@ -305,7 +306,7 @@ int _RBTreeCheckBlackHeight(Node * root, bool & valid) {
 
 bool RBTreeCheckBlackHeight(Node * root) {
 	bool ret = true;
-	int black_height = _RBTreeCheckBlackHeight(root, ret);
+	int black_heigt = _RBTreeCheckBlackHeight(root, ret);
 	return ret;
 }
 
@@ -589,7 +590,10 @@ Node * BRTreeInsert(Node * root, int val) {
 			break;
 		}
 	}
-	if (find_node->value > val) {
+	if (find_node != nullptr && !find_node->is_leaf && find_node->value == val) {
+		return root;
+	}
+	else if (find_node->value > val) {
 		find_node->AddLeftChild(node);
 	}
 	else {
@@ -815,7 +819,6 @@ Node * BRTreeRemove(Node * root, int val) {
 			return root;
 		}
 		else {
-			Node * grand_parent = parent->parent;
 			Node * brother = find_node->Brother();
 			bool is_left = find_node->ImLeftNode();
 			find_node->RemoveFromParent();
@@ -902,6 +905,31 @@ Node * BRTreeRemove(Node * root, int val) {
 	return root;
 }
 
+Node * RBTreeFind(Node * root, int val){
+	Node * find_node = root;
+	while (find_node != nullptr) {
+		if (val < find_node->value) {
+			if (find_node->left_child->is_leaf) {
+				return nullptr;
+			}
+			find_node = find_node->left_child;
+		}
+		else if (val > find_node->value) {
+			if (find_node->right_child->is_leaf) {
+				return nullptr;
+			}
+			find_node = find_node->right_child;
+		}
+		else {
+			break;
+		}
+	}
+	if (find_node != nullptr && find_node->is_leaf){
+		return nullptr;
+	}
+	return find_node;
+}
+
 void BRTreeTest1() {
 	Node * root = BRTreeInsert(nullptr, 7);
 	PrintTree(root);
@@ -981,7 +1009,7 @@ void FullRUpRotationTest() {
 }
 
 void FullBRTreeTest() {
-	int max_val = 20;
+	int max_val = 10;
 	Node * root = nullptr;
 	int res = 1;
 	for (int i = 0; i < max_val; i++) {
@@ -989,22 +1017,55 @@ void FullBRTreeTest() {
 		//int value = max_val - i;
 		cout << "insert :" << value << endl;
 		root = BRTreeInsert(root, value);
-		int r = 
-		cout << RBTreeCheckBlackHeight(root) << endl;
-		//PrintTree(root);
+		root = BRTreeInsert(root, value);
+		int r =  RBTreeCheckBlackHeight(root);
+		cout << r << endl;
+		res = res && r;
+		PrintTree(root);
 	}
 	for (int i = 0; i < max_val; i++) {
 		int del_value = i;
 		//int del_value = max_val - i;
 		cout << "del :" << del_value << endl;
 		root = BRTreeRemove(root, del_value);
-		cout << RBTreeCheckBlackHeight(root) << endl;
+		root = BRTreeRemove(root, del_value);
+		int r =  RBTreeCheckBlackHeight(root);
+		cout << r << endl;
+		res = res && r;
 		//PrintTree(root);
 	}
+	cout << "test res: "  << res << endl;
+}
+
+int RandomInt(int a, int b){
+	return a + rand() % (b - a); 
+}
+
+void MokeyTest(){
+	int test_cnt = 200;
+	Node * root = nullptr;
+	srand(time(nullptr));
+	bool res = 1;
+	for(int idx = 0; idx < test_cnt; idx++){
+		int opt = RandomInt(0, 2);
+		int value = RandomInt(0, 10);
+		if (opt == 0){
+			cout << "insert : " << value << endl;
+			root = BRTreeInsert(root, value);
+		}else{
+			cout << "remove : " << value << endl;
+			root = BRTreeRemove(root, value);
+		}
+		bool res = res && RBTreeCheckBlackHeight(root);
+		cout << res << endl;
+		//PrintTree(root);
+	}
+	cout << res << endl;
 }
 
 int main() {
-	FullBRTreeTest();
+	MokeyTest();
+	//FullBRTreeTest();
 	//UpRotationTest();
 	//FullLUpRotationTest();
 	//FullRUpRotationTest();
