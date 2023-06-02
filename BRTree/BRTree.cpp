@@ -1064,8 +1064,8 @@ void MokeyTest(){
 }
 
 int main() {
-	MokeyTest();
-	//FullBRTreeTest();
+	//MokeyTest();
+	FullBRTreeTest();
 	//UpRotationTest();
 	//FullLUpRotationTest();
 	//FullRUpRotationTest();
