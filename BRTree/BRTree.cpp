@@ -1,4 +1,4 @@
-// BRTree.cpp : ¶¨Òå¿ØÖÆÌ¨Ó¦ÓÃ³ÌÐòµÄÈë¿Úµã¡£
+// BRTree.cpp : ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ì¨Ó¦ï¿½Ã³ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Úµã¡£
 //
 
 #include "stdafx.h"
@@ -296,7 +296,7 @@ int _RBTreeCheckBlackHeight(Node * root, bool & valid) {
 	else {
 		valid = valid && root->left_child->IsBalck() && root->right_child->IsBalck();
 		if (root->parent == nullptr) {
-			//ºì¸ù
+			//ï¿½ï¿½ï¿½
 			valid = false;
 		}
 		return l_b_h;
@@ -596,7 +596,7 @@ Node * BRTreeInsert(Node * root, int val) {
 		find_node->AddRightChild(node);
 	}
 	if (find_node->parent == nullptr) {
-		// Ö»ÓÐ¸ù½ÚµãÒ»²ã
+		// Ö»ï¿½Ð¸ï¿½ï¿½Úµï¿½Ò»ï¿½ï¿½
 		return root;
 	}
 	Node * new_root = RepairInsertTree(node);
@@ -610,7 +610,7 @@ Node * RepairRemoveTree(Node * node) {
 	Node * brother = node->Brother();
 	if (node->parent->IsBalck()) {
 		if (node->Brother()->IsBalck()) {
-			// b(-1) b b, ×óÓÒºÚ¸ßÏàÍ¬,ÏòÉÏÍÆºÚ½Úµã(n-1)
+			// b(-1) b b, ï¿½ï¿½ï¿½ÒºÚ¸ï¿½ï¿½ï¿½Í¬,ï¿½ï¿½ï¿½ï¿½ï¿½ÆºÚ½Úµï¿½(n-1)
 			if (brother->left_child->IsBalck() && brother->right_child->IsBalck()) {
 				// b(-1) b b (b, b)
 				node->Brother()->MakeRed();
@@ -631,7 +631,7 @@ Node * RepairRemoveTree(Node * node) {
 			}
 			else {
 				//b(-1) b b (r, r/b)
-				// ÉÏÐý
+				// ï¿½ï¿½ï¿½ï¿½
 				Node * local_root = nullptr;
 				if (node->ImLeftNode()) {
 					local_root = node->Brother()->left_child;
@@ -670,7 +670,7 @@ Node * RepairRemoveTree(Node * node) {
 }
 
 Node * UpRotation(Node * root, bool is_left) {
-	// É¾³ýºó£¬ÐÎ³É l l l, r r r £¬µ÷Õûºó l c r
+	// É¾ï¿½ï¿½ï¿½ï¿½ï¿½Î³ï¿½ l l l, r r r ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ l c r
 	assert(root != nullptr && !root->left_child->is_leaf && !root->right_child->is_leaf);
 	Node * parent = root->parent;
 	bool root_is_left = root->ImLeftNode();
@@ -738,7 +738,7 @@ Node * BRTreeRemove(Node * root, int val) {
 	}
 	if (!find_node->left_child->is_leaf && !find_node->right_child->is_leaf) {
 		Node * del_node = find_node;
-		// # ÕÒÇ°Çý
+		// # ï¿½ï¿½Ç°ï¿½ï¿½
 		find_node = find_node->left_child;
 		while (!find_node->right_child->is_leaf) {
 			find_node = find_node->right_child;
@@ -794,12 +794,12 @@ Node * BRTreeRemove(Node * root, int val) {
 			is_left_child ? parent->AddLeftChild(lc) : parent->AddRightChild(lc);
 			return root;
 		}
-		// ²»¿ÉÄÜ´æÔÚÉ¾³ýË«×ÓÊ÷µÄÇé¿ö
+		// ï¿½ï¿½ï¿½ï¿½ï¿½Ü´ï¿½ï¿½ï¿½É¾ï¿½ï¿½Ë«ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 		assert(true);
 	}
 	else {
-		// É¾³ýºÚ½Úµã(ºóÁ½²ã)
-		// µ¥º¢×ÓºÚ½Úµã£¬º¢×Ó½ÚµãÖ»ÄÜÊÇºìÉ«
+		// É¾ï¿½ï¿½ï¿½Ú½Úµï¿½(ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½)
+		// ï¿½ï¿½ï¿½ï¿½ï¿½ÓºÚ½Úµã£¬ï¿½ï¿½ï¿½Ó½Úµï¿½Ö»ï¿½ï¿½ï¿½Çºï¿½É«
 		if (!find_node->left_child->is_leaf) {
 			find_node->value = find_node->left_child->value;
 			find_node->left_child->RemoveFromParent();
@@ -983,20 +983,22 @@ void FullRUpRotationTest() {
 void FullBRTreeTest() {
 	int max_val = 20;
 	Node * root = nullptr;
+	int res = 1;
 	for (int i = 0; i < max_val; i++) {
 		int value = i;
 		//int value = max_val - i;
 		cout << "insert :" << value << endl;
-		//root = BRTreeInsert(root, value);
-		//cout << RBTreeCheckBlackHeight(root) << endl;
+		root = BRTreeInsert(root, value);
+		int r = 
+		cout << RBTreeCheckBlackHeight(root) << endl;
 		//PrintTree(root);
 	}
 	for (int i = 0; i < max_val; i++) {
 		int del_value = i;
 		//int del_value = max_val - i;
 		cout << "del :" << del_value << endl;
-		//root = BRTreeRemove(root, del_value);
-		//cout << RBTreeCheckBlackHeight(root) << endl;
+		root = BRTreeRemove(root, del_value);
+		cout << RBTreeCheckBlackHeight(root) << endl;
 		//PrintTree(root);
 	}
 }
@@ -1006,8 +1008,6 @@ int main() {
 	//UpRotationTest();
 	//FullLUpRotationTest();
 	//FullRUpRotationTest();
-	int n;
-	cin >> n;
 	return 0;
 }
 
