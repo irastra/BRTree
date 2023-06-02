@@ -590,10 +590,7 @@ Node * BRTreeInsert(Node * root, int val) {
 			break;
 		}
 	}
-	if (find_node != nullptr && !find_node->is_leaf && find_node->value == val) {
-		return root;
-	}
-	else if (find_node->value > val) {
+	if (find_node->value > val) {
 		find_node->AddLeftChild(node);
 	}
 	else {
@@ -1009,7 +1006,7 @@ void FullRUpRotationTest() {
 }
 
 void FullBRTreeTest() {
-	int max_val = 10;
+	int max_val = 100;
 	Node * root = nullptr;
 	int res = 1;
 	for (int i = 0; i < max_val; i++) {
@@ -1041,7 +1038,37 @@ int RandomInt(int a, int b){
 	return a + rand() % (b - a); 
 }
 
+Node * MonkeyTestCmd(Node * root, int opt, int value, bool & res){
+	if (opt == 0){
+		Node * find_value = RBTreeFind(root, value);
+		if (find_value != nullptr) {
+			res = false;
+			return root;
+		}
+		cout << "insert : " << value << endl;
+		root = BRTreeInsert(root, value);
+	}else{
+		Node * find_value = RBTreeFind(root, value);
+		if (find_value == nullptr) {
+			res = false;
+			return root;
+		}
+		cout << "remove : " << value << endl;
+		root = BRTreeRemove(root, value);
+	}
+	return root;
+}
+
+void MonkeyTestCmdTranslator(vector<int> & vec){
+	for(int i = 0 ; i < vec.size()/ 2; i++){
+		int opt = vec[i*2];
+		int value = vec[i*2] + 1;
+
+	}
+}
+
 void MokeyTest(){
+	vector<int> cmd;
 	int test_cnt = 200;
 	Node * root = nullptr;
 	srand(time(nullptr));
@@ -1049,23 +1076,27 @@ void MokeyTest(){
 	for(int idx = 0; idx < test_cnt; idx++){
 		int opt = RandomInt(0, 2);
 		int value = RandomInt(0, 10);
-		if (opt == 0){
-			cout << "insert : " << value << endl;
-			root = BRTreeInsert(root, value);
-		}else{
-			cout << "remove : " << value << endl;
-			root = BRTreeRemove(root, value);
+		bool opt_res = true;
+		cout << " --- begin --- " << endl;
+		root = MonkeyTestCmd(root, opt, value, opt_res);
+		if (! opt_res){
+			continue;
 		}
-		bool res = res && RBTreeCheckBlackHeight(root);
-		cout << res << endl;
-		//PrintTree(root);
+		cmd.push_back(opt);
+		cmd.push_back(value);
+		res = res && RBTreeCheckBlackHeight(root);
+		PrintTree(root);
+		if(!res){
+			cout << " error " << endl;
+			break;
+		}
 	}
 	cout << res << endl;
 }
 
 int main() {
-	//MokeyTest();
-	FullBRTreeTest();
+	MokeyTest();
+	//FullBRTreeTest();
 	//UpRotationTest();
 	//FullLUpRotationTest();
 	//FullRUpRotationTest();
