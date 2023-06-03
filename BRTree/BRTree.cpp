@@ -910,6 +910,7 @@ Node * BRTreeRemove(Node * root, int val) {
 				// b - b
 				if (!brother->IsBalck()) {
 					// b - b - r (b, b)
+					Node * ori_parent = parent;
 					if (is_left) {
 						parent->LeftRotation();
 					}
@@ -918,15 +919,16 @@ Node * BRTreeRemove(Node * root, int val) {
 					}
 					local_root = brother;
 					local_root->MakeBlack();
-					if(parent->left_child->is_leaf){
-
-					}else if (parent->right_child->is_leaf){
-					
+					if(ori_parent->left_child->is_leaf){
+						// no left child
+						brother->RightRotation();
+					}else if (ori_parent->right_child->is_leaf){
+						// no left child
+						brother->LeftRotation();
 					}else {
-
+						parent->left_child->MakeRed();
+						parent->right_child->MakeRed();
 					}
-					parent->left_child->MakeRed();
-					parent->right_child->MakeRed();
 				}else if (brother->left_child->is_leaf && brother->right_child->is_leaf) {
 					// b - b - b
 					brother->MakeRed();
