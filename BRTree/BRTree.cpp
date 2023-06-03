@@ -528,62 +528,52 @@ void BinarySearchTreeTest() {
 }
 
 Node * RepairInsertTree(Node * node) {
+	// escape r, r
 	assert(!node->IsBalck());
 	Node * parent = node->parent;
 	Node * uncle = node->UncleNode();
 	Node * grand_parent = parent->parent;
 	//cout << node->value << " " << parent->value << " " << uncle->value<< " " << grand_parent->value<< endl;
-	if(uncle->is_leaf){
-		//cout << "----" << endl;
-		grand_parent->MakeRed();
-		if(node->ImLeftNode() && parent->ImLeftNode()){
-			// gp -> right rot 
-			parent->MakeBlack();
-			return grand_parent->RightRotation();
-		}else if (node->ImRightNode() && parent->ImLeftNode()){
-			// gp -> l up rot
-			node->MakeBlack();
-			return grand_parent->UpRotationLRSon();
-		}else if (node->ImRightNode() && parent->ImRightNode()){
-			// gp -> left rot
-			parent->MakeBlack();
-			return grand_parent->LeftRotation();
-		}else{
-			// gp -> r up rot
-			node->MakeBlack();
-			return grand_parent->UpRotationRLSon();
-		}
-	}
-
 	if (parent->IsBalck()) {
-		// r b b
+		return nullptr;
+	}
+	// r, r, b
+	if(uncle->IsBalck()){
+		// r, r, b, b
+		Node * tmp;
+		if(node->ImRightNode() && parent->ImLeftNode()){
+			parent->LeftRotation();
+			tmp = parent;
+			parent= node;
+			node = tmp;
+		}else if (node->ImLeftNode() && parent->ImRightNode()) {
+			parent->RightRotation();
+			tmp = parent;
+			parent= node;
+			node = tmp;
+		}
+		bool is_left = node->ImLeftNode();
+		if((node->ImLeftNode() && parent->ImLeftNode()) || (node->ImRightNode() && parent->ImRightNode()))
+		{
+			parent->MakeBlack();
+			grand_parent->MakeRed();
+			if(is_left){
+				return grand_parent->RightRotation();
+			}else{
+				return grand_parent->LeftRotation();;
+			}
+		}
+		assert(true);
+		return nullptr;
+	}else{
+		// r r b r
 		parent->MakeBlack();
 		uncle->MakeBlack();
-		if (grand_parent->IsRoot()) {
-			//cout << "2" << endl;
-			return nullptr;
+		if(grand_parent->IsRoot()){
+			return grand_parent;
 		}
-		//cout << "3" << endl;
 		grand_parent->MakeRed();
 		return RepairInsertTree(grand_parent);
-	}
-	grand_parent->MakeRed();
-	parent->MakeBlack();
-	if (parent->ImLeftNode()) {
-		if (node->ImRightNode()) {
-			//cout << "4" << endl;
-			parent->LeftRotation();
-		}
-		//cout << "5" << endl;
-		return grand_parent->RightRotation();
-	}
-	else {
-		if (node->ImLeftNode()) {
-			//cout << "6" << endl;
-			parent->RightRotation();
-		}
-		//cout << "7" << endl;
-		return grand_parent->LeftRotation();
 	}
 }
 
@@ -609,20 +599,50 @@ Node * BRTreeInsert(Node * root, int val) {
 	}
 	if (find_node->value > val) {
 		find_node->AddLeftChild(node);
-	}
-	else {
+	}else if(find_node->value < val) {
 		find_node->AddRightChild(node);
-	}
-	if (find_node->parent == nullptr) {
-		// ֻ�и��ڵ�һ��
-		return root;
-	}
-	if (find_node->IsBalck()) {
-		// insert to balck
+	}else {
+		find_node->value = val;
 		return nullptr;
 	}
-	Node * new_root = RepairInsertTree(node);
-	return  new_root == nullptr ? root : new_root;
+	if (find_node->IsBalck()) {
+		// insert to balck, include inser to root
+		return nullptr;
+	}
+	Node * parent = node->parent;
+	Node * grand_parent = node->parent->parent;
+	Node * uncle = node->UncleNode();
+	if(uncle->is_leaf){
+		//cout << "----" << endl;
+		grand_parent->MakeRed();
+		if(node->ImLeftNode() && parent->ImLeftNode()){
+			// gp -> right rot 
+			parent->MakeBlack();
+			return grand_parent->RightRotation();
+		}else if (node->ImRightNode() && parent->ImLeftNode()){
+			// gp -> l up rot
+			node->MakeBlack();
+			return grand_parent->UpRotationLRSon();
+		}else if (node->ImRightNode() && parent->ImRightNode()){
+			// gp -> left rot
+			parent->MakeBlack();
+			return grand_parent->LeftRotation();
+		}else{
+			// gp -> r up rot
+			node->MakeBlack();
+			return grand_parent->UpRotationRLSon();
+		}
+	}
+	if(!uncle->IsBalck()){
+		parent->MakeBlack();
+		uncle->MakeBlack();
+		if(grand_parent->IsRoot()){
+			return nullptr;
+		}
+		grand_parent->MakeRed();
+		return RepairInsertTree(grand_parent);
+	}
+	assert(true);
 }
 
 Node * RepairRemoveTree(Node * node) {
@@ -1098,7 +1118,10 @@ Node * MonkeyTestCmd(Node * root, int opt, int value, bool & res, vector<int> & 
 		cmd_vec.push_back(opt);
 		cmd_vec.push_back(value);
 		PrintCmd(cmd_vec);
-		root = BRTreeInsert(root, value);
+		Node * n_root = BRTreeInsert(root, value);
+		if (n_root != nullptr){
+			root = n_root;
+		}
 	}else{
 		Node * find_value = RBTreeFind(root, value);
 		if (find_value == nullptr) {
@@ -1110,7 +1133,10 @@ Node * MonkeyTestCmd(Node * root, int opt, int value, bool & res, vector<int> & 
 		cmd_vec.push_back(opt);
 		cmd_vec.push_back(value);
 		PrintCmd(cmd_vec);
-		root = BRTreeRemove(root, value);
+		Node * n_root = BRTreeRemove(root, value);
+		if (n_root != nullptr){
+			root = n_root;
+		}
 	}
 	PrintTree(root);
 	return root;
@@ -1135,7 +1161,7 @@ void MokeyTest(){
 	srand(time(nullptr));
 	bool res = 1;
 	for(int idx = 0; idx < test_cnt; idx++){
-		int opt = RandomInt(0, 1);
+		int opt = RandomInt(0, 2);
 		int value = RandomInt(0, 10);
 		bool opt_res = true;
 		root = MonkeyTestCmd(root, opt, value, opt_res, cmd);
@@ -1154,7 +1180,7 @@ int main() {
 	//FullRUpRotationTest2();
 	//FullLUpRotationTest2();
 	//MokeyTest();
-	int cmd_list [] = {0,2,0,3,0,8,0,0,0,5,0,9,0,7,0,4,0,1,0,6};
+	int cmd_list [] ={0,7,0,8,0,1,1,7,0,4,0,2,0,9,0,0,1,0,1,8,0,5,0,0,0,7,0,6,0,8,1,9,1,0,1,4,1,2};
 	MonkeyTestCmdTranslator(cmd_list, sizeof(cmd_list) / sizeof(int));
 	//FullBRTreeTest();
 	//UpRotationTest();
