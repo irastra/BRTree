@@ -8,8 +8,8 @@
       "args": [],
       "stopAtEntry": false,
       "externalConsole": true,
-      "cwd": "c:/Users/irastra/Desktop/BRTree",
-      "program": "c:/Users/irastra/Desktop/BRTree/build/Debug/outDebug",
+      "cwd": "d:/git/BRTree/BRTree",
+      "program": "d:/git/BRTree/BRTree/build/Debug/outDebug",
       "MIMode": "gdb",
       "miDebuggerPath": "gdb",
       "setupCommands": [
