@@ -780,11 +780,20 @@ Node * BRTreeRemove(Node * root, int val) {
 	}
 	if (!find_node->left_child->is_leaf && !find_node->right_child->is_leaf) {
 		Node * del_node = find_node;
-		// # ��ǰ��
-		find_node = find_node->left_child;
-		while (!find_node->right_child->is_leaf) {
+		if (!find_node->left_child->is_leaf && (!find_node->left_child->left_child->is_leaf or !find_node->left_child->right_child->is_leaf)){
+			// # pre link node
+			find_node = find_node->left_child;
+			while (!find_node->right_child->is_leaf) {
+				find_node = find_node->right_child;
+			}
+		}else{
+			// # post link node
 			find_node = find_node->right_child;
+			while (!find_node->left_child->is_leaf) {
+				find_node = find_node->left_child;
+			}
 		}
+		cout << "find node value : " << find_node->value << endl;
 		del_node->value = find_node->value;
 	}
 	Node * parent = find_node->parent;
@@ -1179,9 +1188,9 @@ void MokeyTest(){
 int main() {
 	//FullRUpRotationTest2();
 	//FullLUpRotationTest2();
-	//MokeyTest();
-	int cmd_list [] ={0,7,0,8,0,1,1,7,0,4,0,2,0,9,0,0,1,0,1,8,0,5,0,0,0,7,0,6,0,8,1,9,1,0,1,4,1,2};
-	MonkeyTestCmdTranslator(cmd_list, sizeof(cmd_list) / sizeof(int));
+	MokeyTest();
+	//int cmd_list [] = {0,7,0,6,0,5,1,7,0,0,0,3,0,1,1,0,0,7,1,3,0,2,0,4,1,1,1,4,0,3,0,8,0,9,1,6,1,8,1,5,1,3,1,7,0,1,0,8,1,1}
+	//MonkeyTestCmdTranslator(cmd_list, sizeof(cmd_list) / sizeof(int));
 	//FullBRTreeTest();
 	//UpRotationTest();
 	//FullLUpRotationTest();
