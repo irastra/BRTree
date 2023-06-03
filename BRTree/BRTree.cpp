@@ -918,6 +918,13 @@ Node * BRTreeRemove(Node * root, int val) {
 					}
 					local_root = brother;
 					local_root->MakeBlack();
+					if(parent->left_child->is_leaf){
+
+					}else if (parent->right_child->is_leaf){
+					
+					}else {
+
+					}
 					parent->left_child->MakeRed();
 					parent->right_child->MakeRed();
 				}else if (brother->left_child->is_leaf && brother->right_child->is_leaf) {
@@ -1188,9 +1195,9 @@ void MokeyTest(){
 int main() {
 	//FullRUpRotationTest2();
 	//FullLUpRotationTest2();
-	MokeyTest();
-	//int cmd_list [] = {0,7,0,6,0,5,1,7,0,0,0,3,0,1,1,0,0,7,1,3,0,2,0,4,1,1,1,4,0,3,0,8,0,9,1,6,1,8,1,5,1,3,1,7,0,1,0,8,1,1}
-	//MonkeyTestCmdTranslator(cmd_list, sizeof(cmd_list) / sizeof(int));
+	//MokeyTest();
+	int cmd_list [] = {0,9,0,1,0,0,0,8,0,6,0,7,1,0};
+	MonkeyTestCmdTranslator(cmd_list, sizeof(cmd_list) / sizeof(int));
 	//FullBRTreeTest();
 	//UpRotationTest();
 	//FullLUpRotationTest();
