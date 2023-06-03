@@ -529,18 +529,10 @@ void BinarySearchTreeTest() {
 
 Node * RepairInsertTree(Node * node) {
 	assert(!node->IsBalck());
-	//cout << "0" << endl;
 	Node * parent = node->parent;
 	Node * uncle = node->UncleNode();
 	Node * grand_parent = parent->parent;
-	
 	//cout << node->value << " " << parent->value << " " << uncle->value<< " " << grand_parent->value<< endl;
-
-	if (parent->IsBalck()) {
-		//cout << "1" << endl;
-		return nullptr;
-	}
-
 	if(uncle->is_leaf){
 		//cout << "----" << endl;
 		grand_parent->MakeRed();
@@ -563,8 +555,8 @@ Node * RepairInsertTree(Node * node) {
 		}
 	}
 
-	if (!parent->IsBalck() && !uncle->IsBalck()) {
-		// r r r
+	if (parent->IsBalck()) {
+		// r b b
 		parent->MakeBlack();
 		uncle->MakeBlack();
 		if (grand_parent->IsRoot()) {
@@ -624,6 +616,10 @@ Node * BRTreeInsert(Node * root, int val) {
 	if (find_node->parent == nullptr) {
 		// ֻ�и��ڵ�һ��
 		return root;
+	}
+	if (find_node->IsBalck()) {
+		// insert to balck
+		return nullptr;
 	}
 	Node * new_root = RepairInsertTree(node);
 	return  new_root == nullptr ? root : new_root;
