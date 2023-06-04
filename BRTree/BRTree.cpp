@@ -719,14 +719,51 @@ Node * RepairRemoveTree(Node * node) {
 		else {
 			// b(-1) b r
 			node->Brother()->MakeBlack();
+			Node * b_l_l = brother->left_child->left_child;
+			Node * b_l_r = brother->left_child->right_child;
+			Node * b_r_l = brother->right_child->left_child;
+			Node * b_r_r = brother->right_child->right_child;
+			Node * local_parent = brother;
+			Node * new_target = nullptr;
+			Node * n_l = nullptr;
+			Node * n_r = nullptr;
 			if (node->ImLeftNode()) {
-				node->Brother()->left_child->MakeRed();
-				return node->parent->LeftRotation();
+				node->parent->LeftRotation();
+				if(b_l_l->IsBalck() && b_l_r->IsBalck()){
+					node->Brother()->left_child->MakeRed();
+				}else {
+					new_target = b_r_l;
+					n_l = new_target->left_child;
+					n_r = new_target->right_child;
+					if(!n_r->IsBalck()){
+						local_parent->left_child->LeftRotation();
+						n_r->MakeBlack();
+					}else {
+						new_target->RightRotation();
+						new_target->MakeRed();
+						n_l->MakeBlack();
+					}
+				}
 			}
 			else {
-				node->Brother()->right_child->MakeRed();
-				return  node->parent->RightRotation();
+				node->parent->RightRotation();
+				if(b_l_l->IsBalck() && b_l_r->IsBalck()){
+					node->Brother()->right_child->MakeRed();
+				}else {
+					new_target = b_l_r;
+					n_l = new_target->left_child;
+					n_r = new_target->right_child;
+					if(!n_l->IsBalck()){
+						local_parent->right_child->RightRotation();
+						n_l->MakeBlack();
+					}else {
+						new_target->LeftRotation();
+						new_target->MakeRed();
+						n_r->MakeBlack();
+					}
+				}
 			}
+			return local_parent;
 		}
 	}
 	else {
@@ -1118,13 +1155,13 @@ Node * MonkeyTestCmdTranslator(const int * cmd_list, int len){
 
 void MokeyTest(){
 	vector<int> cmd;
-	int test_cnt = 20;
+	int test_cnt = 200;
 	Node * root = nullptr;
 	srand(time(nullptr));
 	bool res = 1;
-	int max_value = 9;
+	int max_value = 12;
 	for(int idx = 0; idx < test_cnt; idx++){
-		int opt = RandomInt(0, 1);
+		int opt = RandomInt(0, 2);
 		int value = RandomInt(0, max_value);
 		bool opt_res = true;
 		root = MonkeyTestCmd(root, opt, value, opt_res, cmd);
@@ -1132,11 +1169,11 @@ void MokeyTest(){
 		if(!res){
 			break;
 		}
-		if(max_value == TreeValueCnt(root)){
-			delete root;
-			root = nullptr;
-			cmd.clear();
-		}
+		// if(max_value == TreeValueCnt(root)){
+		// 	delete root;
+		// 	root = nullptr;
+		// 	cmd.clear();
+		// }
 	}
 	cout << res << endl;
 }
@@ -1144,7 +1181,7 @@ void MokeyTest(){
 int main() {
 	//FullRUpRotationTest2();
 	//FullLUpRotationTest2();
-	int cmd_list [] = {0,9,0,1,0,0,0,8,0,6,0,7,1,0};
+	int cmd_list [] = {0,10,0,5,0,0,0,7,1,7,0,11,0,7,0,3,1,11,0,2,0,1,0,6,1,5};
 	Node * root = MonkeyTestCmdTranslator(cmd_list, sizeof(cmd_list) / sizeof(int));
 	//MokeyTest();
 	//UpRotationTest();
