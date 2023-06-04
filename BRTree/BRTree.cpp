@@ -58,6 +58,14 @@ public:
 		return parent == nullptr;
 	}
 
+	bool HasSon() {
+		Node * ll = left_child->left_child;
+		Node * lr = left_child->right_child;
+		Node * rl = right_child->left_child;
+		Node * rr = right_child->right_child;
+		return (ll != nullptr || lr != nullptr || rl != nullptr || rr != nullptr);
+	}
+
 	void CreateLeaf() {
 		assert(!is_leaf);
 		if (left_child == nullptr) {
@@ -792,86 +800,70 @@ Node * BRTreeRemove(Node * root, int val) {
 		cout << "find node value : " << find_node->value << endl;
 		del_node->value = find_node->value;
 	}
+	// can make delete node just has one child
 	Node * parent = find_node->parent;
-	if (parent == nullptr) {
+	if (find_node->IsRoot()) {
+		// just has one child, delete root , make child be root
 		if (!find_node->left_child->is_leaf) {
 			find_node->value = find_node->left_child->value;
 			find_node->left_child->RemoveFromParent();
 			delete find_node->left_child;
 			find_node->CreateLeaf();
-			return find_node;
+			return root;
 		}
 		else if (!find_node->right_child->is_leaf) {
 			find_node->value = find_node->right_child->value;
 			find_node->right_child->RemoveFromParent();
 			delete find_node->right_child;
 			find_node->CreateLeaf();
-			return find_node;
+			return root;
 		}
+		// delete root and not has any child
 		delete find_node;
 		return nullptr;
 	}
 	if (!find_node->IsBalck()) {
+		// find_node is red, just delete and make it's child replace this
 		bool is_left_child = find_node->ImLeftNode();
 		if (find_node->left_child->is_leaf && find_node->right_child->is_leaf) {
 			find_node->RemoveFromParent();
-			if (parent != nullptr) {
-				parent->CreateLeaf();
-			}
 			delete find_node;
 			return root;
+		}else {
+			// find not is red and it just has one child, not exist (r b, not blance), (r, r not regular) 
+			assert(true);
 		}
-		else if (find_node->left_child->is_leaf) {
-			Node * rc = find_node->right_child;
-			find_node->RemoveFromParent();
-			if (parent != nullptr) {
-				parent->CreateLeaf();
-			}
-			delete find_node;
-			is_left_child ? parent->AddLeftChild(rc) : parent->AddRightChild(rc);
-			return root;
-		}
-		else if (find_node->right_child->is_leaf) {
-			Node * lc = find_node->left_child;
-			find_node->RemoveFromParent();
-			if (parent != nullptr) {
-				parent->CreateLeaf();
-			}
-			delete find_node;
-			is_left_child ? parent->AddLeftChild(lc) : parent->AddRightChild(lc);
-			return root;
-		}
-		// �����ܴ���ɾ��˫���������
 		assert(true);
 	}
 	else {
-		// ɾ���ڽڵ�(������)
-		// �����Ӻڽڵ㣬���ӽڵ�ֻ���Ǻ�ɫ
-		if (!find_node->left_child->is_leaf) {
-			find_node->value = find_node->left_child->value;
-			find_node->left_child->RemoveFromParent();
-			delete find_node->left_child;
-			find_node->CreateLeaf();
-			return root;
-		}
-		else if (!find_node->right_child->is_leaf) {
-			find_node->value = find_node->right_child->value;
-			find_node->right_child->RemoveFromParent();
-			delete find_node->right_child;
-			find_node->CreateLeaf();
-			return root;
-		}
-		else {
+		// find node is balck and just has one red child or not has child 
+		Node * l = find_node->left_child;
+		Node * r = find_node->right_child;
+		bool has_two_child = bool(!l->is_leaf && !r->is_leaf);
+		assert(!has_two_child);
+		if(!(l->is_leaf && r->is_leaf)){
+			if (!l->is_leaf) {
+				find_node->value = l->value;
+				l->RemoveFromParent();
+				delete l;
+				return root;
+			}else{
+				find_node->value = r->value;
+				r->RemoveFromParent();
+				delete r;
+				return root;
+			}
+		} else {
+			// find not is black and , find not not has child
 			Node * brother = find_node->Brother();
 			bool is_left = find_node->ImLeftNode();
 			find_node->RemoveFromParent();
 			delete find_node;
-			parent->CreateLeaf();
 			Node * local_root = nullptr;
 			// b - r - ?
-			bool l_l = is_left && brother->left_child->is_leaf;
-			bool r_r = !is_left && brother->right_child->is_leaf;
-			if (!parent->IsBalck()) {
+			bool l_l = is_left && !brother->right_child->is_leaf;
+			bool r_r = !is_left && !brother->left_child->is_leaf;
+			if (!parent->IsBalck()) { // parent is red b - r  (black height 1)
 				if (brother->left_child->is_leaf && brother->right_child->is_leaf) {
 					// b - r - b
 					parent->MakeBlack();
@@ -879,7 +871,7 @@ Node * BRTreeRemove(Node * root, int val) {
 					return root;
 				}
 				else if (l_l || r_r || (!brother->left_child->is_leaf && !brother->right_child->is_leaf)) {
-					// b - r - b (r, r)  / b - r - b (rr)
+					// b - r <<r> b <r>>   / b - r <b<r>>  
 					local_root = brother;
 					if (is_left) {
 						parent->LeftRotation();
@@ -887,51 +879,77 @@ Node * BRTreeRemove(Node * root, int val) {
 					else {
 						parent->RightRotation();
 					}
-					local_root->MakeRed();
 					local_root->left_child->MakeBlack();
 					local_root->right_child->MakeBlack();
-				}
-				else {
-					parent->MakeRed();
-					local_root = UpRotation(parent, is_left);
-				}
-				if (local_root->parent == nullptr) {
+					if(!local_root->IsRoot()){
+						// keep black height 1
+						local_root->MakeRed();
+						return root;
+					}
 					return local_root;
 				}
-				return root;
+				else {
+					local_root = UpRotation(parent, is_left);
+					local_root->left_child->MakeBlack();
+					local_root->right_child->MakeBlack();
+					if(local_root->IsRoot()){
+						local_root->MakeBlack();
+						return local_root;
+					}
+					return root;
+				}
 			}
 			else {
 				bool l_l = is_left && brother->left_child->is_leaf;
 				bool r_r = !is_left && brother->right_child->is_leaf;
-				// b - b
+				// b - b - r  
 				if (!brother->IsBalck()) {
 					// b - b - r (b, b)
+					Node* b_l_l = brother->left_child->left_child;
+					Node* b_l_r = brother->left_child->right_child;
+					Node* b_r_l = brother->right_child->left_child;
+					Node* b_r_r = brother->right_child->right_child;
 					Node * ori_parent = parent;
+					local_root = brother;
+					local_root->MakeBlack();
 					if (is_left) {
 						parent->LeftRotation();
 					}
 					else {
 						parent->RightRotation();
 					}
-					local_root = brother;
-					local_root->MakeBlack();
-					if(ori_parent->left_child->is_leaf){
-						// no left child
-						brother->RightRotation();
-					}else if (ori_parent->right_child->is_leaf){
-						// no left child
-						brother->LeftRotation();
-					}else {
-						parent->left_child->MakeRed();
-						parent->right_child->MakeRed();
+					if(find_node->ImLeftNode() && (!b_l_l->is_leaf || !b_l_r->is_leaf)){
+						local_root->left_child->LeftRotation();
+						// b < <<r>b<r>> r <<r>b><r>>
+						if(!b_l_l->is_leaf){
+							local_root->left_child->left_child->MakeRed();
+						}else{
+							UpRotation(b_l_l, b_l_l->ImLeftNode());
+						}
+					}else if(find_node->ImRightNode() && (!b_r_l->is_leaf || !b_r_r->is_leaf)){
+						// b < <<r>b<r>> r <<r>b><r>>
+						local_root->right_child->RightRotation();
+						if(!b_r_r->is_leaf){
+							local_root->right_child->right_child->MakeRed();
+						}else {
+							UpRotation(b_r_r, b_r_r->ImLeftNode());
+						}
+					}else{
+						// <b> b <<b>r<b>>
+						if (is_left){
+							local_root->left_child->right_child->MakeRed();
+						}else{
+							local_root->right_child->left_child->MakeRed();
+						}
 					}
+					//assert(true);
 				}else if (brother->left_child->is_leaf && brother->right_child->is_leaf) {
-					// b - b - b
+					// <b> b <b>
 					brother->MakeRed();
 					local_root = RepairRemoveTree(parent);
 				}
 				else if (l_l || r_r || (!brother->left_child->is_leaf && !brother->right_child->is_leaf)) {
-					// b - b - r (b, b)
+					// <b> b <r> b <r>
 					local_root = brother;
 					if (is_left) {
 						parent->LeftRotation();
@@ -943,10 +961,10 @@ Node * BRTreeRemove(Node * root, int val) {
 					local_root->right_child->MakeBlack();
 				}
 				else {
+					// <b> b <r> b <r>
 					local_root = UpRotation(parent, is_left);
 					local_root->MakeBlack();
 				}
-
 				if (local_root != nullptr && local_root->parent == nullptr) {
 					return local_root;
 				}
