@@ -1164,21 +1164,20 @@ int GetVecNum(int idx){
 	idx = idx % num_vec.size();
 	int ret = num_vec[idx];
 	num_vec.erase(num_vec.begin() + idx);
-	cout << " vec size " << num_vec.size() << endl;
 	return ret;
 }
 
 void MokeyTest(){
 	vector<int> cmd;
-	int test_cnt = 40;
+	int test_cnt = 21;
 	Node * root = nullptr;
 	srand(time(nullptr));
 	bool res = 1;
-	int max_value = 20;
-	Init_Vect(max_value+ 10);
+	int max_value = 10;
+	Init_Vect(max_value);
 	int opt_min = 0, opt_max=1; // insert
 	for(int idx = 0; idx < test_cnt; idx++){
-		int opt = RandomInt(0, 2);
+		int opt = RandomInt(opt_min, opt_max);
 		int value_idx = RandomInt(0, max_value);
 		int value = GetVecNum(value_idx);
 		bool opt_res = true;
@@ -1188,11 +1187,13 @@ void MokeyTest(){
 			break;
 		}
 		if(max_value == TreeValueCnt(root)){
+			cout << "to add >>>>" << endl;
 			opt_min = 1;
 			opt_max = 2;
 			Init_Vect(max_value);
 			cmd.clear();
 		}else if(0 == TreeValueCnt(root)){
+			cout << "to del >>>>" << endl;
 			opt_min = 0;
 			opt_max = 1;
 			Init_Vect(max_value);
@@ -1200,6 +1201,16 @@ void MokeyTest(){
 		}
 	}
 	cout << res << endl;
+}
+
+void GetNumTest(){
+	int max_n = 10;
+	Init_Vect(max_n);
+	srand(time(nullptr));
+	for(int i = 0; i < 10; i++){
+		int idx = RandomInt(0, max_n);
+		cout << GetVecNum(idx) << endl;
+	}
 }
 
 int main() {
