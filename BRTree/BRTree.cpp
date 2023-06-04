@@ -959,7 +959,7 @@ Node * BRTreeRemove(Node * root, int val) {
 						if(b_l_l->is_leaf){
 							local_root->left_child->left_child->MakeRed();
 						}else{
-							UpRotation(b_l_l, b_l_l->ImLeftNode());
+							UpRotation(b_l_l->parent->parent, b_l_l->ImLeftNode());
 						}
 					}else if(!is_left && (!b_r_l->is_leaf || !b_r_r->is_leaf)){
 						// b < <<r>b<r>> r <<r>b><r>>
@@ -967,7 +967,7 @@ Node * BRTreeRemove(Node * root, int val) {
 						if(b_r_r->is_leaf){
 							local_root->right_child->right_child->MakeRed();
 						}else {
-							UpRotation(b_r_r, b_r_r->ImLeftNode());
+							UpRotation(b_r_r->parent->parent, b_r_r->ImLeftNode());
 						}
 					}else{
 						// <b> b <<b>r<b>>
@@ -1134,7 +1134,7 @@ Node * MonkeyTestCmd(Node * root, int opt, int value, bool & res, vector<int> & 
 			root = n_root;
 		}
 	}
-	PrintTree(root);
+	//PrintTree(root);
 	return root;
 }
 
@@ -1151,17 +1151,36 @@ Node * MonkeyTestCmdTranslator(const int * cmd_list, int len){
 	return root;
 }
 
+vector<int> num_vec;
+void Init_Vect(int max_num){
+	num_vec.clear();
+	for(int i = 0; i < max_num; i++){
+		num_vec.push_back(i);
+	}
+}
+
+int GetVecNum(int idx){
+	assert(num_vec.size()>0);
+	idx = idx % num_vec.size();
+	int ret = num_vec[idx];
+	num_vec.erase(num_vec.begin() + idx);
+	cout << " vec size " << num_vec.size() << endl;
+	return ret;
+}
+
 void MokeyTest(){
 	vector<int> cmd;
-	int test_cnt = 500;
+	int test_cnt = 40;
 	Node * root = nullptr;
 	srand(time(nullptr));
 	bool res = 1;
 	int max_value = 20;
+	Init_Vect(max_value+ 10);
 	int opt_min = 0, opt_max=1; // insert
 	for(int idx = 0; idx < test_cnt; idx++){
 		int opt = RandomInt(0, 2);
-		int value = RandomInt(0, max_value);
+		int value_idx = RandomInt(0, max_value);
+		int value = GetVecNum(value_idx);
 		bool opt_res = true;
 		root = MonkeyTestCmd(root, opt, value, opt_res, cmd);
 		res = res && RBTreeCheckBlackHeight(root);
@@ -1171,10 +1190,12 @@ void MokeyTest(){
 		if(max_value == TreeValueCnt(root)){
 			opt_min = 1;
 			opt_max = 2;
+			Init_Vect(max_value);
 			cmd.clear();
 		}else if(0 == TreeValueCnt(root)){
 			opt_min = 0;
 			opt_max = 1;
+			Init_Vect(max_value);
 			cmd.clear();
 		}
 	}
@@ -1185,8 +1206,8 @@ int main() {
 	//FullRUpRotationTest2();
 	//FullLUpRotationTest2();
 	int cmd_list [] = {0,7,0,1,0,4,0,14,0,13,1,4,0,9,0,11,0,2,0,10,1,11,0,5,0,11,0,18,1,10,0,16,0,6,0,4,0,10,0,0,0,8,1,2,1,8,0,8,0,17,0,3,0,2,1,18,1,0};
-	Node * root = MonkeyTestCmdTranslator(cmd_list, sizeof(cmd_list) / sizeof(int));
-	//MokeyTest();
+	//Node * root = MonkeyTestCmdTranslator(cmd_list, sizeof(cmd_list) / sizeof(int));
+	MokeyTest();
 	//UpRotationTest();
 	//FullLUpRotationTest();
 	//FullRUpRotationTest();
