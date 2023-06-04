@@ -918,18 +918,18 @@ Node * BRTreeRemove(Node * root, int val) {
 					else {
 						parent->RightRotation();
 					}
-					if(find_node->ImLeftNode() && (!b_l_l->is_leaf || !b_l_r->is_leaf)){
+					if(is_left && (!b_l_l->is_leaf || !b_l_r->is_leaf)){
 						local_root->left_child->LeftRotation();
 						// b < <<r>b<r>> r <<r>b><r>>
-						if(!b_l_l->is_leaf){
+						if(b_l_l->is_leaf){
 							local_root->left_child->left_child->MakeRed();
 						}else{
 							UpRotation(b_l_l, b_l_l->ImLeftNode());
 						}
-					}else if(find_node->ImRightNode() && (!b_r_l->is_leaf || !b_r_r->is_leaf)){
+					}else if(!is_left && (!b_r_l->is_leaf || !b_r_r->is_leaf)){
 						// b < <<r>b<r>> r <<r>b><r>>
 						local_root->right_child->RightRotation();
-						if(!b_r_r->is_leaf){
+						if(b_r_r->is_leaf){
 							local_root->right_child->right_child->MakeRed();
 						}else {
 							UpRotation(b_r_r, b_r_r->ImLeftNode());
