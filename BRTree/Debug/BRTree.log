@@ -1,5 +1,2 @@
-﻿  BRTree.cpp
-d:\git\brtree\brtree\brtree.cpp : warning C4819: The file contains a character that cannot be represented in the current code page (936). Save the file in Unicode format to prevent data loss
-d:\git\brtree\brtree\brtree.cpp(1047): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
-  BRTree.vcxproj -> D:\git\BRTree\Debug\BRTree.exe
-  BRTree.vcxproj -> D:\git\BRTree\Debug\BRTree.pdb (Full PDB)
+﻿  stdafx.cpp
+d:\git\brtree\brtree\stdafx.cpp(5): error C2859: D:\git\BRTree\BRTree\Debug\vc140.idb is not the idb file that was used when this precompiled header was created, recreate the precompiled header.

@@ -1,5 +1,4 @@
 // BRTree.cpp : black red tree
-//
 #include "stdafx.h"
 #include "stdlib.h"
 #include "time.h"
@@ -313,7 +312,7 @@ void RefreshNodePosition(Node* node, int ** last_value) {
 	}
 	node->width = 1;
 	node->height = 1;
-	if (node->left_child != nullptr) {
+	if (node->left_child != nullptr && !node->left_child->is_leaf) {
 		RefreshNodePosition(node->left_child, last_value);
 		node->width += node->left_child->width;
 		node->height += node->left_child->height;
@@ -326,7 +325,7 @@ void RefreshNodePosition(Node* node, int ** last_value) {
 	}
 	//cout << node->value << " " << node->order_idx << endl;
 	*last_value = &node->order_idx;
-	if (node->right_child != nullptr) {
+	if (node->right_child != nullptr && !node->right_child->is_leaf) {
 		RefreshNodePosition(node->right_child, last_value);
 		node->width += node->right_child->width;
 		if (node->right_child->height + 1 > node->height) {
@@ -1129,12 +1128,9 @@ Node * MonkeyTestCmd(Node * root, int opt, int value, bool & res, vector<int> & 
 		cmd_vec.push_back(opt);
 		cmd_vec.push_back(value);
 		PrintCmd(cmd_vec);
-		Node * n_root = BRTreeRemove(root, value);
-		if (n_root != nullptr){
-			root = n_root;
-		}
+		root = BRTreeRemove(root, value);
 	}
-	//PrintTree(root);
+	PrintTree(root);
 	return root;
 }
 
@@ -1169,7 +1165,7 @@ int GetVecNum(int idx){
 
 void MokeyTest(){
 	vector<int> cmd;
-	int test_cnt = 21;
+	int test_cnt = 5000;
 	Node * root = nullptr;
 	srand(time(nullptr));
 	bool res = 1;
@@ -1186,14 +1182,16 @@ void MokeyTest(){
 		if(!res){
 			break;
 		}
-		if(max_value == TreeValueCnt(root)){
-			cout << "to add >>>>" << endl;
+		int left_num = TreeValueCnt(root);
+		//cout << left_num << endl;
+		if(max_value == left_num){
+			//cout << "to del >>>>" << endl;
 			opt_min = 1;
 			opt_max = 2;
 			Init_Vect(max_value);
-			cmd.clear();
-		}else if(0 == TreeValueCnt(root)){
-			cout << "to del >>>>" << endl;
+			//cmd.clear();
+		}else if(0 == left_num){
+			//cout << "to add >>>>" << endl;
 			opt_min = 0;
 			opt_max = 1;
 			Init_Vect(max_value);
@@ -1216,9 +1214,9 @@ void GetNumTest(){
 int main() {
 	//FullRUpRotationTest2();
 	//FullLUpRotationTest2();
-	int cmd_list [] = {0,7,0,1,0,4,0,14,0,13,1,4,0,9,0,11,0,2,0,10,1,11,0,5,0,11,0,18,1,10,0,16,0,6,0,4,0,10,0,0,0,8,1,2,1,8,0,8,0,17,0,3,0,2,1,18,1,0};
-	//Node * root = MonkeyTestCmdTranslator(cmd_list, sizeof(cmd_list) / sizeof(int));
-	MokeyTest();
+	int cmd_list [] = { 0,2,0,3,0,9,0,1,0,0,0,4,0,6,0,5,0,7,0,8,1,8,1,5,1,1,1,4,1,6,1,7,1,2,1,3,1,0 };
+	Node * root = MonkeyTestCmdTranslator(cmd_list, sizeof(cmd_list) / sizeof(int));
+	//MokeyTest();
 	//UpRotationTest();
 	//FullLUpRotationTest();
 	//FullRUpRotationTest();
