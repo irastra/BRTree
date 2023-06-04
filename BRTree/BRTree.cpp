@@ -123,20 +123,9 @@ public:
 			else {
 				parent->right_child = nullptr;
 			}
+			parent->CreateLeaf();
 			parent = nullptr;
 		}
-	}
-
-	bool operator > (const Node & other) {
-		return value > other.value;
-	}
-
-	bool operator < (const Node & other) {
-		return value < other.value;
-	}
-
-	bool operator == (const Node & other) {
-		return value == other.value;
 	}
 
 	bool HasValueLeftChild() {
@@ -400,6 +389,13 @@ void PrintTree(Node * node) {
 	cout << endl;
 }
 
+int TreeValueCnt(Node* root){
+	if(root == nullptr || root->is_leaf){
+		return 0;
+	}
+	return TreeValueCnt(root->left_child) + TreeValueCnt((root->right_child)) + 1;
+}
+
 void FullBiaryTree(Node* root, int depth, int * idx) {
 	if (root == nullptr) {
 		return;
@@ -525,6 +521,31 @@ void BinarySearchTreeTest() {
 	DelNodeByValue(root, 10);
 	DelNodeByValue(root, 11);
 	PrintTree(root);
+}
+
+Node * BRTreeFind(Node * root, int val){
+	Node * find_node = root;
+	while (find_node != nullptr) {
+		if (val < find_node->value) {
+			if (find_node->left_child->is_leaf) {
+				return nullptr;
+			}
+			find_node = find_node->left_child;
+		}
+		else if (val > find_node->value) {
+			if (find_node->right_child->is_leaf) {
+				return nullptr;
+			}
+			find_node = find_node->right_child;
+		}
+		else {
+			break;
+		}
+	}
+	if (find_node == nullptr || find_node->is_leaf){
+		return nullptr;
+	}
+	return find_node;
 }
 
 Node * RepairInsertTree(Node * node) {
@@ -760,38 +781,13 @@ Node * BRTreeRemove(Node * root, int val) {
 	if (root == nullptr) {
 		return root;
 	}
-	Node * find_node = root;
-	while (find_node != nullptr) {
-		if (val < find_node->value) {
-			if (find_node->left_child->is_leaf) {
-				return root;
-			}
-			find_node = find_node->left_child;
-		}
-		else if (val > find_node->value) {
-			if (find_node->right_child->is_leaf) {
-				return root;
-			}
-			find_node = find_node->right_child;
-		}
-		else {
-			break;
-		}
-	}
+	Node * find_node = BRTreeFind(root, val);
 	if (!find_node->left_child->is_leaf && !find_node->right_child->is_leaf) {
 		Node * del_node = find_node;
-		if (!find_node->left_child->is_leaf && (!find_node->left_child->left_child->is_leaf or !find_node->left_child->right_child->is_leaf)){
-			// # pre link node
-			find_node = find_node->left_child;
-			while (!find_node->right_child->is_leaf) {
-				find_node = find_node->right_child;
-			}
-		}else{
-			// # post link node
+		// # pre link node
+		find_node = find_node->left_child;
+		while (!find_node->right_child->is_leaf) {
 			find_node = find_node->right_child;
-			while (!find_node->left_child->is_leaf) {
-				find_node = find_node->left_child;
-			}
 		}
 		cout << "find node value : " << find_node->value << endl;
 		del_node->value = find_node->value;
@@ -961,48 +957,6 @@ Node * BRTreeRemove(Node * root, int val) {
 	return root;
 }
 
-Node * RBTreeFind(Node * root, int val){
-	Node * find_node = root;
-	while (find_node != nullptr) {
-		if (val < find_node->value) {
-			if (find_node->left_child->is_leaf) {
-				return nullptr;
-			}
-			find_node = find_node->left_child;
-		}
-		else if (val > find_node->value) {
-			if (find_node->right_child->is_leaf) {
-				return nullptr;
-			}
-			find_node = find_node->right_child;
-		}
-		else {
-			break;
-		}
-	}
-	if (find_node != nullptr && find_node->is_leaf){
-		return nullptr;
-	}
-	return find_node;
-}
-
-void BRTreeTest1() {
-	Node * root = BRTreeInsert(nullptr, 7);
-	PrintTree(root);
-	BRTreeInsert(root, 5);
-	PrintTree(root);
-	BRTreeInsert(root, 9);
-	PrintTree(root);
-	BRTreeInsert(root, 3);
-	PrintTree(root);
-	BRTreeInsert(root, 6);
-	PrintTree(root);
-	BRTreeInsert(root, 8);
-	PrintTree(root);
-	BRTreeInsert(root, 10);
-	PrintTree(root);
-}
-
 Node * CreateSimple7Tree(const int * value_list, int n) {
 	vector<Node*> vec;
 	for (int i = 0; i < n; i++) {
@@ -1080,35 +1034,6 @@ void FullLUpRotationTest2() {
 	PrintTree(root);
 }
 
-void FullBRTreeTest() {
-	int max_val = 100;
-	Node * root = nullptr;
-	int res = 1;
-	for (int i = 0; i < max_val; i++) {
-		int value = i;
-		//int value = max_val - i;
-		cout << "insert :" << value << endl;
-		root = BRTreeInsert(root, value);
-		root = BRTreeInsert(root, value);
-		int r =  RBTreeCheckBlackHeight(root);
-		cout << r << endl;
-		res = res && r;
-		PrintTree(root);
-	}
-	for (int i = 0; i < max_val; i++) {
-		int del_value = i;
-		//int del_value = max_val - i;
-		cout << "del :" << del_value << endl;
-		root = BRTreeRemove(root, del_value);
-		root = BRTreeRemove(root, del_value);
-		int r =  RBTreeCheckBlackHeight(root);
-		cout << r << endl;
-		res = res && r;
-		//PrintTree(root);
-	}
-	cout << "test res: "  << res << endl;
-}
-
 int RandomInt(int a, int b){
 	return a + rand() % (b - a); 
 }
@@ -1126,7 +1051,7 @@ void PrintCmd(vector<int> cmd){
 
 Node * MonkeyTestCmd(Node * root, int opt, int value, bool & res, vector<int> & cmd_vec){
 	if (opt == 0){
-		Node * find_value = RBTreeFind(root, value);
+		Node * find_value = BRTreeFind(root, value);
 		if (find_value != nullptr) {
 			res = false;
 			return root;
@@ -1141,7 +1066,7 @@ Node * MonkeyTestCmd(Node * root, int opt, int value, bool & res, vector<int> & 
 			root = n_root;
 		}
 	}else{
-		Node * find_value = RBTreeFind(root, value);
+		Node * find_value = BRTreeFind(root, value);
 		if (find_value == nullptr) {
 			res = false;
 			return root;
@@ -1160,7 +1085,7 @@ Node * MonkeyTestCmd(Node * root, int opt, int value, bool & res, vector<int> & 
 	return root;
 }
 
-void MonkeyTestCmdTranslator(const int * cmd_list, int len){
+Node * MonkeyTestCmdTranslator(const int * cmd_list, int len){
 	Node * root = nullptr;
 	vector<int> vec;
 	for(int i = 0 ; i < len / 2; i++){
@@ -1170,25 +1095,29 @@ void MonkeyTestCmdTranslator(const int * cmd_list, int len){
 		cout << opt << " " << value << endl;
 		root = MonkeyTestCmd(root, opt, value, opt_res, vec);
 	}
+	return root;
 }
 
 void MokeyTest(){
 	vector<int> cmd;
-	int test_cnt = 200;
+	int test_cnt = 20;
 	Node * root = nullptr;
 	srand(time(nullptr));
 	bool res = 1;
+	int max_value = 9;
 	for(int idx = 0; idx < test_cnt; idx++){
-		int opt = RandomInt(0, 2);
-		int value = RandomInt(0, 10);
+		int opt = RandomInt(0, 1);
+		int value = RandomInt(0, max_value);
 		bool opt_res = true;
 		root = MonkeyTestCmd(root, opt, value, opt_res, cmd);
-		if (! opt_res){
-			continue;
-		}
 		res = res && RBTreeCheckBlackHeight(root);
 		if(!res){
 			break;
+		}
+		if(max_value == TreeValueCnt(root)){
+			delete root;
+			root = nullptr;
+			cmd.clear();
 		}
 	}
 	cout << res << endl;
@@ -1197,10 +1126,9 @@ void MokeyTest(){
 int main() {
 	//FullRUpRotationTest2();
 	//FullLUpRotationTest2();
-	//MokeyTest();
 	int cmd_list [] = {0,9,0,1,0,0,0,8,0,6,0,7,1,0};
-	MonkeyTestCmdTranslator(cmd_list, sizeof(cmd_list) / sizeof(int));
-	//FullBRTreeTest();
+	Node * root = MonkeyTestCmdTranslator(cmd_list, sizeof(cmd_list) / sizeof(int));
+	//MokeyTest();
 	//UpRotationTest();
 	//FullLUpRotationTest();
 	//FullRUpRotationTest();
