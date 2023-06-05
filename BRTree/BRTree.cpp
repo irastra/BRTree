@@ -776,27 +776,34 @@ Node * RepairRemoveTree(Node * node) {
 		Node* b_r_r = b_r->right_child;
 		Node* parent = node->parent;
 		if (node->ImLeftNode()) {
-			local_root = node->parent->LeftRotation();
-			if ((!b_l->IsBalck() && !b_r->IsBalck()) || !b_r->IsBalck()) {
-				b_r->MakeBlack();
-				local_root->MakeRed();
-				parent->MakeBlack();
-			}else if(!b_l->IsBalck() && b_r->IsBalck()){
+			if (!b_l->IsBalck() && b_r->IsBalck()) {
+				local_root = brother->RightRotation();
+				brother->MakeRed();
 				b_l->MakeBlack();
-				b_l_l->MakeRed();
-				b_l_r->MakeRed();
+				parent->LeftRotation();
+			}
+			else {
+				local_root = node->parent->LeftRotation();
+				if ((!b_l->IsBalck() && !b_r->IsBalck()) || !b_r->IsBalck()) {
+					b_r->MakeBlack();
+					local_root->MakeRed();
+					parent->MakeBlack();
+				}
 			}
 		}
 		else {
-			local_root = node->parent->RightRotation();
-			if ((!b_l->IsBalck() && !b_r->IsBalck()) || !b_l->IsBalck()) {
-				b_l->MakeBlack();
-				local_root->MakeRed();
-				parent->MakeBlack();
-			}else if(!b_r->IsBalck() && b_l->IsBalck()){
+			if (!b_r->IsBalck() && b_l->IsBalck()) {
+				local_root = brother->LeftRotation();
 				b_r->MakeBlack();
-				b_r_l->MakeRed();
-				b_r_r->MakeRed();
+				parent->RightRotation();
+			}
+			else {
+				local_root = node->parent->RightRotation();
+				if ((!b_l->IsBalck() && !b_r->IsBalck()) || !b_l->IsBalck()) {
+					b_l->MakeBlack();
+					local_root->MakeRed();
+					parent->MakeBlack();
+				}
 			}
 		}
 		return local_root;
@@ -1260,9 +1267,9 @@ void GetNumTest(){
 int main() {
 	//FullRUpRotationTest2();
 	//FullLUpRotationTest2();
-	int cmd_list[] = { 0,2,0,14,0,13,0,1,0,0,0,4,0,5,0,6,0,7,0,12,0,8,0,9,0,11,0,10,0,3,1,6 };
+	int cmd_list[] = { 0,8,0,14,0,0,0,10,0,9,0,1,0,2,0,3,0,4,0,6,0,12,0,11,0,5,0,13,0,7,1,10,1,2 };
 	Node * root = MonkeyTestCmdTranslator(cmd_list, sizeof(cmd_list) / sizeof(int));
-	// MokeyTest();
+	//MokeyTest();
 	//UpRotationTest();
 	//FullLUpRotationTest();
 	//FullRUpRotationTest();
