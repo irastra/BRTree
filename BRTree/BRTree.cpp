@@ -734,32 +734,37 @@ Node * RepairRemoveTree(Node * node) {
 					new_target = b_l;
 					n_l = new_target->left_child;
 					n_r = new_target->right_child;
-					if(!n_r->IsBalck()){
-						local_parent->left_child->LeftRotation();
-						n_r->MakeBlack();
-					}else {
+					if (n_r->IsBalck()) {
 						new_target->RightRotation();
-						new_target->MakeRed();
-						n_l->MakeBlack();
+						new_target = n_l;
+						n_l = new_target->left_child;
+						n_r = new_target->right_child;
+						n_r->MakeRed();
 					}
+					local_parent->left_child->LeftRotation();
+					new_target->MakeRed();
+					n_r->MakeBlack();
 				}
 			}
 			else {
 				node->parent->RightRotation();
-				if(b_l_l->IsBalck() && b_l_r->IsBalck()){
+				if(b_r_l->IsBalck() && b_r_r->IsBalck()){
 					b_r->MakeRed();
 				}else {
 					new_target = b_r;
 					n_l = new_target->left_child;
 					n_r = new_target->right_child;
-					if(!n_l->IsBalck()){
-						local_parent->right_child->RightRotation();
-						n_l->MakeBlack();
-					}else {
+					if (n_l->IsBalck()) {
 						new_target->LeftRotation();
-						new_target->MakeRed();
-						n_r->MakeBlack();
+						new_target = n_r;
+						n_l = new_target->left_child;
+						n_r = new_target->right_child;
+						n_l->MakeRed();
 					}
+					local_parent->right_child->RightRotation();
+					new_target->MakeRed();
+					n_l->MakeBlack();
+
 				}
 			}
 			return local_parent;
@@ -783,10 +788,10 @@ Node * RepairRemoveTree(Node * node) {
 				parent->LeftRotation();
 			}
 			else {
-				local_root = node->parent->LeftRotation();
+				local_root = parent->LeftRotation();
 				if ((!b_l->IsBalck() && !b_r->IsBalck()) || !b_r->IsBalck()) {
 					b_r->MakeBlack();
-					local_root->MakeRed();
+					brother->MakeRed();
 					parent->MakeBlack();
 				}
 			}
@@ -794,14 +799,15 @@ Node * RepairRemoveTree(Node * node) {
 		else {
 			if (!b_r->IsBalck() && b_l->IsBalck()) {
 				local_root = brother->LeftRotation();
+				brother->MakeRed();
 				b_r->MakeBlack();
 				parent->RightRotation();
 			}
 			else {
-				local_root = node->parent->RightRotation();
+				local_root = parent->RightRotation();
 				if ((!b_l->IsBalck() && !b_r->IsBalck()) || !b_l->IsBalck()) {
 					b_l->MakeBlack();
-					local_root->MakeRed();
+					brother->MakeRed();
 					parent->MakeBlack();
 				}
 			}
@@ -1211,11 +1217,11 @@ int GetVecNum(int idx){
 
 void MokeyTest(){
 	vector<int> cmd;
-	int test_cnt = 500000;
+	int test_cnt = 50000;
 	Node * root = nullptr;
 	srand(time(nullptr));
 	bool res = 1;
-	int max_value = 15;
+	int max_value = 500;
 	Init_Vect(max_value);
 	int opt_min = 0, opt_max=1; // insert
 	for(int idx = 0; idx < test_cnt; idx++){
@@ -1267,9 +1273,9 @@ void GetNumTest(){
 int main() {
 	//FullRUpRotationTest2();
 	//FullLUpRotationTest2();
-	int cmd_list[] = { 0,8,0,14,0,0,0,10,0,9,0,1,0,2,0,3,0,4,0,6,0,12,0,11,0,5,0,13,0,7,1,10,1,2 };
-	Node * root = MonkeyTestCmdTranslator(cmd_list, sizeof(cmd_list) / sizeof(int));
-	//MokeyTest();
+	int cmd_list[] = { 0,8,0,13,0,10,0,9,0,12,0,0,0,6,0,7,0,11,0,14,0,2,0,1,0,3,0,4,0,5,1,8 };
+	//Node * root = MonkeyTestCmdTranslator(cmd_list, sizeof(cmd_list) / sizeof(int));
+	MokeyTest();
 	//UpRotationTest();
 	//FullLUpRotationTest();
 	//FullRUpRotationTest();

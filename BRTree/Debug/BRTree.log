@@ -1,8 +1,8 @@
 ﻿  BRTree.cpp
 d:\git\brtree\brtree\brtree.cpp : warning C4819: The file contains a character that cannot be represented in the current code page (936). Save the file in Unicode format to prevent data loss
-d:\git\brtree\brtree\brtree.cpp(1129): warning C4018: '<': signed/unsigned mismatch
-d:\git\brtree\brtree\brtree.cpp(1216): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
-d:\git\brtree\brtree\brtree.cpp(1260): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
+d:\git\brtree\brtree\brtree.cpp(1135): warning C4018: '<': signed/unsigned mismatch
+d:\git\brtree\brtree\brtree.cpp(1222): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
+d:\git\brtree\brtree\brtree.cpp(1266): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
 d:\git\brtree\brtree\brtree.cpp(674): warning C4715: 'BRTreeInsert': not all control paths return a value
   BRTree.vcxproj -> D:\git\BRTree\Debug\BRTree.exe
   BRTree.vcxproj -> D:\git\BRTree\Debug\BRTree.pdb (Full PDB)
