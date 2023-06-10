@@ -5,6 +5,7 @@
 #include <iostream>
 #include <assert.h>
 #include <queue>
+#include <list>
 #include <string>
 #include <vector>
 #include "util.h"
@@ -347,20 +348,21 @@ void PrintTree(Node * node) {
 		cout << " ============== invalid =============" << endl;
 		//return;
 	}
-	queue<Node*> node_que1, node_que2;
-	queue<Node*> * cur_node_que_ptr = &node_que1, *back_node_que_ptr = &node_que2;
-	queue<Node*> *tmp = nullptr;
+	list<Node*> node_que1, node_que2;
+	list<Node*> * cur_node_list_ptr = &node_que1, *back_node_list_ptr = &node_que2;
+	list<Node*> *tmp = nullptr;
+	int lidx=0, ridx = 0;
 	if (node == nullptr) {
-		cout << " Empty Tree !" << endl;
+		cout << " [Null] !" << endl;
 		return;
 	}
 	RefreshTree(node);
-	cur_node_que_ptr->push(node);
-	while (!cur_node_que_ptr->empty()) {
+	cur_node_list_ptr->push_back(node);
+	while (!cur_node_list_ptr->empty()) {
 		int cnt = 0;
-		while (!cur_node_que_ptr->empty()) {
-			node = cur_node_que_ptr->front();
-			cur_node_que_ptr->pop();
+		while (!cur_node_list_ptr->empty()) {
+			node = cur_node_list_ptr->front();
+			cur_node_list_ptr->pop_front();
 			int print_cnt = node->order_idx - cnt - 1;
 			for (int i = 0; i < print_cnt; i++) {
 				print(" ");
@@ -379,16 +381,30 @@ void PrintTree(Node * node) {
 			}
 			cnt += 1;
 			if (node->left_child != nullptr) {
-				back_node_que_ptr->push(node->left_child);
+				back_node_list_ptr->push_back(node->left_child);
 			}
 			if (node->right_child != nullptr) {
-				back_node_que_ptr->push(node->right_child);
+				back_node_list_ptr->push_back(node->right_child);
 			}
 		}
 		cout << endl;
-		tmp = cur_node_que_ptr;
-		cur_node_que_ptr = back_node_que_ptr;
-		back_node_que_ptr = tmp;
+		int section_print_cnt = 0;
+		std::list<Node*>::iterator it = back_node_list_ptr->begin();
+		for (; it != back_node_list_ptr->end(); it++) {
+			Node* cur_node = *it;
+			lidx = cur_node->order_idx;
+			ridx = cur_node->Brother()->order_idx - 1;
+			for (; section_print_cnt < lidx; section_print_cnt++) {
+				print_fill(" ");
+			}
+			for (; section_print_cnt < ridx; section_print_cnt++) {
+				print_fill("-");
+			}
+		}
+		cout << endl;
+		tmp = cur_node_list_ptr;
+		cur_node_list_ptr = back_node_list_ptr;
+		back_node_list_ptr = tmp;
 	}
 	for (int i = 0; i < root->width * 4; i++) {
 		cout << "-";
@@ -1274,12 +1290,14 @@ int main() {
 	//FullRUpRotationTest2();
 	//FullLUpRotationTest2();
 	int cmd_list[] = { 0,8,0,13,0,10,0,9,0,12,0,0,0,6,0,7,0,11,0,14,0,2,0,1,0,3,0,4,0,5,1,8 };
-	//Node * root = MonkeyTestCmdTranslator(cmd_list, sizeof(cmd_list) / sizeof(int));
-	MokeyTest();
+	Node * root = MonkeyTestCmdTranslator(cmd_list, sizeof(cmd_list) / sizeof(int));
+	//Node* root = CreateSimple7Tree([1, -1, -1], 3);
+	//MokeyTest();
 	//UpRotationTest();
 	//FullLUpRotationTest();
 	//FullRUpRotationTest();
 	cout << "finished!" << endl;
+	list<Node*> l;
 	return 0;
 }
 
