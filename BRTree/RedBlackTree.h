@@ -150,6 +150,7 @@ Node* BRTreeInsert(Node* root, int val) {
 		return RepairInsertTree(grand_parent);
 	}
 	assert(true);
+	return nullptr;
 }
 
 Node* RepairRemoveTree(Node* node) {

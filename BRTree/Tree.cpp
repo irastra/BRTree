@@ -25,7 +25,7 @@ int _RBTreeCheckBlackHeight(Node* root, bool& valid) {
 	}
 }
 
-bool RBTreeCheckBlackHeight(Node* root) {
+bool RBTreeCheckFunc(Node* root) {
 	bool ret = true;
 	int black_heigt = _RBTreeCheckBlackHeight(root, ret);
 	return ret;
@@ -65,13 +65,13 @@ void RefreshTree(Node* root) {
 	RefreshNodePosition(root, &ptr);
 }
 
-bool DefaultCheckFunc(Node* root) {
+bool SearchTreeCheckFunc(Node* root) {
 	return true;
 }
 
 void PrintTree(Node* node) {
 	Node* root = node;
-	bool valid = RBTreeCheckBlackHeight(root);
+	bool valid = RBTreeCheckFunc(root);
 	if (!valid) {
 		cout << " ============== invalid =============" << endl;
 		//return;

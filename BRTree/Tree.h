@@ -224,12 +224,19 @@ public:
 		Node* r_son_l = r_son->left_child;
 		Node* r_son_r = r_son->right_child;
 		_root->RemoveFromParent();
-		r_son_l->RemoveFromParent();
+
 		r_son->RemoveFromParent();
 		r->RemoveFromParent();
-		r_son_r->RemoveFromParent();
-		r->AddLeftChild(r_son_r);
-		_root->AddRightChild(r_son_l);
+		if (r_son_r != nullptr) {
+			r_son_r->RemoveFromParent();
+			r->AddLeftChild(r_son_r);
+		}
+
+		if (r_son_l != nullptr) {
+			r_son_l->RemoveFromParent();
+			_root->AddRightChild(r_son_l);
+		}
+		
 		r_son->AddLeftChild(_root);
 		r_son->AddRightChild(r);
 		if (_parent != nullptr) {
@@ -253,12 +260,17 @@ public:
 		Node* l_son_l = l_son->left_child;
 		Node* l_son_r = l_son->right_child;
 		_root->RemoveFromParent();
-		l_son_r->RemoveFromParent();
+		
 		l_son->RemoveFromParent();
 		l->RemoveFromParent();
-		l_son_l->RemoveFromParent();
-		l->AddRightChild(l_son_l); // ok
-		_root->AddLeftChild(l_son_r); // ok
+		if (l_son_l != nullptr) {
+			l_son_l->RemoveFromParent();
+			l->AddRightChild(l_son_l); // ok
+		}
+		if (l_son_r != nullptr) {
+			l_son_r->RemoveFromParent();
+			_root->AddLeftChild(l_son_r); // ok
+		}
 		l_son->AddRightChild(_root); // ok
 		l_son->AddLeftChild(l); // ok
 		if (_parent != nullptr) {
@@ -291,7 +303,7 @@ public:
 
 int _RBTreeCheckBlackHeight(Node* root, bool& valid);
 
-bool RBTreeCheckBlackHeight(Node* root);
+bool RBTreeCheckFunc(Node* root);
 
 void RefreshNodePosition(Node* node, int** last_value);
 

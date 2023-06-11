@@ -47,13 +47,16 @@
     <ClCompile Include="BRTree.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="BlanceTree.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Tree.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="util.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BlanceTree.h">
+      <Filter>Header Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BlanceTree.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

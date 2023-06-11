@@ -2,8 +2,9 @@
 #include <vector>
 #include <iostream>
 #include "Tree.h"
-#include "RedBlackTree.h"
 #include "time.h"
+#include "RedBlackTree.h"
+#include "BlanceTree.h"
 
 using namespace std;
 
@@ -205,7 +206,7 @@ void MokeyTest(int test_cnt, int max_value, Node* BRTreeInsert(Node*, int), Node
 		bool opt_res = true;
 		try {
 			root = MonkeyTestCmd(root, opt, key_value, opt_res, cmd, BRTreeInsert, BRTreeRemove, false);
-			res = res && RBTreeCheckBlackHeight(root);
+			res = res && RBTreeCheckFunc(root);
 		}
 		catch (exception e) {
 			res = false;

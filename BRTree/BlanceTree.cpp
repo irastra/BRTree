@@ -1,7 +1,7 @@
 #include "stdafx.h"
-#include "Tree.h"
 #include <algorithm>
 #include <math.h>
+#include "BlanceTree.h"
 using namespace std;
 
 Node* BlanceTreeFind(Node* root, int val, Node** ret_parent) {
@@ -136,4 +136,9 @@ Node* BlanceTreeInsert(Node* root, int val) {
 	}
 	Node* new_root = RepairBlanceTree(new_node);
 	return new_root;
+}
+
+bool BlanceTreeCheckFunc(Node* root) {
+	int blance = BlanceTreeHeight(root->left_child) - BlanceTreeHeight(root->right_child);
+	return abs(blance) <= 1;
 }

@@ -1,3 +1,6 @@
-﻿  BlanceTree.cpp
+﻿  BRTree.cpp
+d:\git\brtree\brtree\test.h(111): warning C4018: '<': signed/unsigned mismatch
+d:\git\brtree\brtree\test.h(198): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
+Debug\BlanceTree.obj : warning LNK4042: object specified more than once; extras ignored
   BRTree.vcxproj -> D:\git\BRTree\Debug\BRTree.exe
   BRTree.vcxproj -> D:\git\BRTree\Debug\BRTree.pdb (Full PDB)
