@@ -99,6 +99,21 @@ Node* RepairBlanceTree(Node* node) {
 			return new_parent;
 		}
 	}
+	else {
+		if (b_blance_factor <= 0) {
+			new_parent = parent->RightRotation();
+			RefreshBlanceTreeHeight(new_parent, 2);
+			if (b_blance_factor < 0) {
+				new_parent = RepairBlanceTree(parent);
+			}
+		}
+		else {
+			new_parent = parent->UpRotationLRSon();
+			RefreshBlanceTreeHeight(new_parent, 2);
+			new_parent = RepairBlanceTree(parent);
+			return new_parent;
+		}
+	}
 	return nullptr;
 }
 

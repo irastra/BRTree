@@ -62,7 +62,7 @@ void UpRotationTest() {
 	Node* rr = new Node(0);
 	rr->AddLeftChild(root);
 	PrintTree(rr);
-	Node* n_root = UpRotation(root, false);
+	Node* n_root = root->UpRotation(false);
 	if (n_root != nullptr) {
 		rr = n_root;
 	}

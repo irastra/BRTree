@@ -297,49 +297,6 @@ Node* RepairRemoveTree(Node* node) {
 	}
 }
 
-Node* UpRotation(Node* root, bool is_left) {
-	// ɾ�����γ� l l l, r r r �������� l c r
-	//assert(root != nullptr && !root->left_child->is_leaf && !root->right_child->is_leaf);
-	Node* parent = root->parent;
-	bool root_is_left = root->ImLeftNode();
-	Node* l = root->left_child;
-	Node* ll = root->left_child->left_child;
-	Node* lr = root->left_child->right_child;
-	Node* r = root->right_child;
-	Node* rl = root->right_child->left_child;
-	Node* rr = root->right_child->right_child;
-	Node* local_root = nullptr;
-	l->RemoveFromParent();
-	root->RemoveFromParent();
-	r->RemoveFromParent();
-	if (is_left) {
-		delete l;
-		rl->RemoveFromParent();
-		local_root = rl;
-		local_root->AddLeftChild(root);
-		local_root->AddRightChild(r);
-	}
-	else {
-		delete r;
-		lr->RemoveFromParent();
-		local_root = lr;
-		local_root->AddLeftChild(l);
-		local_root->AddRightChild(root);
-	}
-	if (parent != nullptr) {
-		if (root_is_left) {
-			parent->AddLeftChild(local_root);
-		}
-		else {
-			parent->AddRightChild(local_root);
-		}
-	}
-	local_root->CreateLeaf();
-	local_root->left_child->CreateLeaf();
-	local_root->right_child->CreateLeaf();
-	return local_root;
-}
-
 Node* BRTreeRemove(Node* root, int val) {
 	if (root == nullptr) {
 		return root;
@@ -447,7 +404,7 @@ Node* BRTreeRemove(Node* root, int val) {
 					return local_root;
 				}
 				else {
-					local_root = UpRotation(parent, is_left);
+					local_root = parent->UpRotation(is_left);
 					local_root->left_child->MakeBlack();
 					local_root->right_child->MakeBlack();
 					if (local_root->IsRoot()) {
@@ -483,7 +440,7 @@ Node* BRTreeRemove(Node* root, int val) {
 							local_root->left_child->left_child->MakeRed();
 						}
 						else {
-							UpRotation(b_l_l->parent->parent, b_l_l->ImLeftNode());
+							b_l_l->parent->parent->UpRotation(b_l_l->ImLeftNode());
 						}
 					}
 					else if (!is_left && (!b_r_l->is_leaf || !b_r_r->is_leaf)) {
@@ -493,7 +450,7 @@ Node* BRTreeRemove(Node* root, int val) {
 							local_root->right_child->right_child->MakeRed();
 						}
 						else {
-							UpRotation(b_r_r->parent->parent, b_r_r->ImLeftNode());
+							b_r_r->parent->parent->UpRotation(b_r_r->ImLeftNode());
 						}
 					}
 					else {
@@ -526,7 +483,7 @@ Node* BRTreeRemove(Node* root, int val) {
 				}
 				else {
 					// <b> b <r> b <r>
-					local_root = UpRotation(parent, is_left);
+					local_root = parent->UpRotation(is_left);
 					local_root->MakeBlack();
 				}
 				if (local_root != nullptr && local_root->parent == nullptr) {

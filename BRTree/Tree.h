@@ -272,6 +272,21 @@ public:
 		}
 		return l_son;
 	}
+
+	Node* UpRotation(bool is_left) {
+		Node* l = left_child;
+		Node* r = right_child;
+		Node* r_l = r->left_child;
+		Node* l_r = l->right_child;
+		if (is_left) {
+			UpRotationRLSon();
+			return r_l;
+		}
+		else {
+			UpRotationLRSon();
+			return l_r;
+		}
+	}
 };
 
 int _RBTreeCheckBlackHeight(Node* root, bool& valid);
