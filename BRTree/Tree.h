@@ -23,10 +23,10 @@ public:
 	int height;
 	int order_idx;
 	int width;
-	int value;
-	Node(int value) {
+	int key;
+	Node(int key_value) {
 		init();
-		this->value = value;
+		this->key = key_value;
 	}
 
 	Node() {
@@ -48,7 +48,7 @@ public:
 			delete right_child;
 		}
 		left_child = right_child = parent = nullptr;
-		value = -1;
+		key = -1;
 	}
 
 	bool IsRoot() {

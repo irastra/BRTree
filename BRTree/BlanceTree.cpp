@@ -8,10 +8,10 @@ Node* BlanceTreeFind(Node* root, int val, Node** ret_parent) {
 	*ret_parent = nullptr;
 	Node* find_node = root;
 	while (find_node != nullptr) {
-		if (find_node->value == val) {
+		if (find_node->key == val) {
 			break;
 		}
-		else if (find_node->value > val) {
+		else if (find_node->key > val) {
 			*ret_parent = find_node;
 			find_node = find_node->left_child;
 		}
@@ -113,7 +113,7 @@ Node* BlanceTreeInsert(Node* root, int val) {
 	find_node = BlanceTreeFind(root, val, insert_parent);
 	assert(find_node == nullptr);
 	find_node = *insert_parent;
-	if (val < find_node->value) {
+	if (val < find_node->key) {
 		find_node->AddLeftChild(new_node);
 	}
 	else {

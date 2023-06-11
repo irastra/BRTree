@@ -4,13 +4,13 @@
 Node* BRTreeFind(Node* root, int val) {
 	Node* find_node = root;
 	while (find_node != nullptr) {
-		if (val < find_node->value) {
+		if (val < find_node->key) {
 			if (find_node->left_child->is_leaf) {
 				return nullptr;
 			}
 			find_node = find_node->left_child;
 		}
-		else if (val > find_node->value) {
+		else if (val > find_node->key) {
 			if (find_node->right_child->is_leaf) {
 				return nullptr;
 			}
@@ -32,7 +32,7 @@ Node* RepairInsertTree(Node* node) {
 	Node* parent = node->parent;
 	Node* uncle = node->UncleNode();
 	Node* grand_parent = parent->parent;
-	//cout << node->value << " " << parent->value << " " << uncle->value<< " " << grand_parent->value<< endl;
+	//cout << node->key << " " << parent->key << " " << uncle->key<< " " << grand_parent->key<< endl;
 	if (parent->IsBalck()) {
 		return nullptr;
 	}
@@ -89,24 +89,24 @@ Node* BRTreeInsert(Node* root, int val) {
 	}
 	Node* find_node = root;
 	while (find_node != nullptr) {
-		if (find_node->value > val && find_node->HasValueLeftChild()) {
+		if (find_node->key > val && find_node->HasValueLeftChild()) {
 			find_node = find_node->left_child;
 		}
-		else if (find_node->value < val && find_node->HasValueRightChild()) {
+		else if (find_node->key < val && find_node->HasValueRightChild()) {
 			find_node = find_node->right_child;
 		}
 		else {
 			break;
 		}
 	}
-	if (find_node->value > val) {
+	if (find_node->key > val) {
 		find_node->AddLeftChild(node);
 	}
-	else if (find_node->value < val) {
+	else if (find_node->key < val) {
 		find_node->AddRightChild(node);
 	}
 	else {
-		find_node->value = val;
+		find_node->key = val;
 		return nullptr;
 	}
 	if (find_node->IsBalck()) {
@@ -352,22 +352,22 @@ Node* BRTreeRemove(Node* root, int val) {
 		while (!find_node->right_child->is_leaf) {
 			find_node = find_node->right_child;
 		}
-		//cout << "find node value : " << find_node->value << endl;
-		del_node->value = find_node->value;
+		//cout << "find node key_value : " << find_node->key << endl;
+		del_node->key = find_node->key;
 	}
 	// can make delete node just has one child
 	Node* parent = find_node->parent;
 	if (find_node->IsRoot()) {
 		// just has one child, delete root , make child be root
 		if (!find_node->left_child->is_leaf) {
-			find_node->value = find_node->left_child->value;
+			find_node->key = find_node->left_child->key;
 			Node* l_c = find_node->left_child;
 			l_c->RemoveFromParent();
 			delete l_c;
 			return root;
 		}
 		else if (!find_node->right_child->is_leaf) {
-			find_node->value = find_node->right_child->value;
+			find_node->key = find_node->right_child->key;
 			Node* r_c = find_node->right_child;
 			r_c->RemoveFromParent();
 			delete r_c;
@@ -399,13 +399,13 @@ Node* BRTreeRemove(Node* root, int val) {
 		assert(!has_two_child);
 		if (!(l->is_leaf && r->is_leaf)) {
 			if (!l->is_leaf) {
-				find_node->value = l->value;
+				find_node->key = l->key;
 				l->RemoveFromParent();
 				delete l;
 				return root;
 			}
 			else {
-				find_node->value = r->value;
+				find_node->key = r->key;
 				r->RemoveFromParent();
 				delete r;
 				return root;

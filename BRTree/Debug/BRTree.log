@@ -1,3 +1,11 @@
-﻿  Tree.cpp
+﻿  stdafx.cpp
+  util.cpp
+  Tree.cpp
+  BRTree.cpp
+d:\git\brtree\brtree\test.h(110): warning C4018: '<': signed/unsigned mismatch
+d:\git\brtree\brtree\test.h(197): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
+  BlanceTree.cpp
+  Generating Code...
+d:\git\brtree\brtree\redblacktree.h(153): warning C4715: 'BRTreeInsert': not all control paths return a value
   BRTree.vcxproj -> D:\git\BRTree\Debug\BRTree.exe
   BRTree.vcxproj -> D:\git\BRTree\Debug\BRTree.pdb (Full PDB)

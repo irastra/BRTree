@@ -48,7 +48,7 @@ void RefreshNodePosition(Node* node, int** last_value) {
 	else {
 		node->order_idx = 1;
 	}
-	//cout << node->value << " " << node->order_idx << endl;
+	//cout << node->key << " " << node->order_idx << endl;
 	*last_value = &node->order_idx;
 	if (node->right_child != nullptr) {
 		RefreshNodePosition(node->right_child, last_value);
@@ -101,10 +101,10 @@ void PrintTree(Node* node) {
 			}
 			else {
 				if (node->node_color == NodeColor::RED) {
-					print("<" + std::to_string(node->value) + ">");
+					print("<" + std::to_string(node->key) + ">");
 				}
 				else {
-					print("[" + std::to_string(node->value) + "]");
+					print("[" + std::to_string(node->key) + "]");
 				}
 			}
 			cnt += 1;

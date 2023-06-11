@@ -27,8 +27,8 @@ void FullBiaryTree(Node* root, int depth, int* idx) {
 Node* CreateSimple7Tree(const int* value_list, int n) {
 	vector<Node*> vec;
 	for (int i = 0; i < n; i++) {
-		int value = value_list[i];
-		if (value < 0) {
+		int key_value = value_list[i];
+		if (key_value < 0) {
 			vec.push_back(nullptr);
 			continue;
 		}
@@ -116,40 +116,40 @@ void PrintCmd(vector<int> cmd) {
 	cout << "}" << endl;
 }
 
-Node* MonkeyTestCmd(Node* root, int opt, int value, bool& res, vector<int>& cmd_vec, Node* BRTreeInsert(Node*, int), Node* BRTreeRemove(Node*, int), bool debug = true) {
+Node* MonkeyTestCmd(Node* root, int opt, int key_value, bool& res, vector<int>& cmd_vec, Node* BRTreeInsert(Node*, int), Node* BRTreeRemove(Node*, int), bool debug = true) {
 	if (opt == 0) {
-		Node* find_value = BRTreeFind(root, value);
+		Node* find_value = BRTreeFind(root, key_value);
 		if (find_value != nullptr) {
 			res = false;
 			return root;
 		}
 
 		cmd_vec.push_back(opt);
-		cmd_vec.push_back(value);
+		cmd_vec.push_back(key_value);
 		if (debug) {
-			cout << "insert : " << value << endl;
+			cout << "insert : " << key_value << endl;
 			PrintCmd(cmd_vec);
 		}
 
-		Node* n_root = BRTreeInsert(root, value);
+		Node* n_root = BRTreeInsert(root, key_value);
 		if (n_root != nullptr) {
 			root = n_root;
 		}
 	}
 	else {
-		Node* find_value = BRTreeFind(root, value);
+		Node* find_value = BRTreeFind(root, key_value);
 		if (find_value == nullptr) {
 			res = false;
 			return root;
 		}
 		cmd_vec.push_back(opt);
-		cmd_vec.push_back(value);
+		cmd_vec.push_back(key_value);
 		if (debug) {
 			cout << " --- begin --- " << endl;
 			PrintCmd(cmd_vec);
 		}
 		try {
-			root = BRTreeRemove(root, value);
+			root = BRTreeRemove(root, key_value);
 		}
 		catch (exception e) {
 			res = false;
@@ -167,10 +167,10 @@ Node* MonkeyTestCmdTranslator(const int* cmd_list, int len, Node* BRTreeInsert(N
 	vector<int> vec;
 	for (int i = 0; i < len / 2; i++) {
 		int opt = cmd_list[i * 2];
-		int value = cmd_list[i * 2 + 1];
+		int key_value = cmd_list[i * 2 + 1];
 		bool opt_res;
-		cout << opt << " " << value << endl;
-		root = MonkeyTestCmd(root, opt, value, opt_res, vec, BRTreeInsert, BRTreeRemove);
+		cout << opt << " " << key_value << endl;
+		root = MonkeyTestCmd(root, opt, key_value, opt_res, vec, BRTreeInsert, BRTreeRemove);
 	}
 	return root;
 }
@@ -201,10 +201,10 @@ void MokeyTest(int test_cnt, int max_value, Node* BRTreeInsert(Node*, int), Node
 	for (int idx = 0; idx < test_cnt; idx++) {
 		int opt = RandomInt(opt_min, opt_max);
 		int value_idx = RandomInt(0, max_value);
-		int value = GetVecNum(value_idx);
+		int key_value = GetVecNum(value_idx);
 		bool opt_res = true;
 		try {
-			root = MonkeyTestCmd(root, opt, value, opt_res, cmd, BRTreeInsert, BRTreeRemove, false);
+			root = MonkeyTestCmd(root, opt, key_value, opt_res, cmd, BRTreeInsert, BRTreeRemove, false);
 			res = res && RBTreeCheckBlackHeight(root);
 		}
 		catch (exception e) {

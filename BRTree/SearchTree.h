@@ -1,37 +1,37 @@
 #pragma once
 #include "Tree.h"
 
-Node * InsertValueToSearchTree(Node* root, int value) {
+Node * InsertValueToSearchTree(Node* root, int key_value) {
 	if (root == nullptr) {
-		Node* node = new Node(value);
+		Node* node = new Node(key_value);
 		return node;
 	}
-	if (value <= root->value) {
+	if (key_value <= root->key) {
 		if (root->left_child != nullptr) {
-			InsertValueToSearchTree(root->left_child, value);
+			InsertValueToSearchTree(root->left_child, key_value);
 		}
 		else {
-			Node* node = new Node(value);
+			Node* node = new Node(key_value);
 			root->AddLeftChild(node);
 		}
 	}
 	else {
 		if (root->right_child != nullptr) {
-			InsertValueToSearchTree(root->right_child, value);
+			InsertValueToSearchTree(root->right_child, key_value);
 		}
 		else {
-			Node* node = new Node(value);
+			Node* node = new Node(key_value);
 			root->AddRightChild(node);
 		}
 	}
 	return root;
 }
 
-Node* DelNodeFromSearchTree(Node* root, int value) {
+Node* DelNodeFromSearchTree(Node* root, int key_value) {
 	if (root == nullptr) {
 		return nullptr;
 	}
-	if (value == root->value) {
+	if (key_value == root->key) {
 		if (root->left_child == nullptr && root->right_child == nullptr) {
 			root->RemoveFromParent();
 			delete root;
@@ -42,7 +42,7 @@ Node* DelNodeFromSearchTree(Node* root, int value) {
 			while (find_node->right_child != nullptr) {
 				find_node = find_node->right_child;
 			}
-			root->value = find_node->value;
+			root->key = find_node->key;
 			Node* parent = find_node->parent;
 			bool is_left_child = parent->left_child == find_node ? true : false;
 			find_node->RemoveFromParent();
@@ -63,7 +63,7 @@ Node* DelNodeFromSearchTree(Node* root, int value) {
 			while (find_node->left_child != nullptr) {
 				find_node = find_node->left_child;
 			}
-			root->value = find_node->value;
+			root->key = find_node->key;
 			Node* parent = find_node->parent;
 			bool is_left_child = parent->left_child == find_node ? true : false;
 			find_node->RemoveFromParent();
@@ -81,10 +81,10 @@ Node* DelNodeFromSearchTree(Node* root, int value) {
 		}
 		return root;
 	}
-	else if (value < root->value) {
-		return DelNodeFromSearchTree(root->left_child, value);
+	else if (key_value < root->key) {
+		return DelNodeFromSearchTree(root->left_child, key_value);
 	}
 	else {
-		return DelNodeFromSearchTree(root->right_child, value);
+		return DelNodeFromSearchTree(root->right_child, key_value);
 	}
 }
